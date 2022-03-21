@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SolutionSystemEquationMultioperations
+namespace SolutionSystemEquationMultioperations.methods
 {
     class NumericalMethod
     {
@@ -16,7 +16,25 @@ namespace SolutionSystemEquationMultioperations
         {
             string[][] pairs;
             string[][] res = null;
-
+            //Если условие через систему уравнений
+            if (conditionsInput != null)
+            {
+                string[][] temp = new string[equation.Length + conditionsInput.Length][];
+                int c = 0;
+                for (int i = 0; i < temp.Length; i++)
+                {
+                    if (i < equation.Length) temp[i] = equation[i];
+                    else
+                    {
+                        string[] t = new string[1];
+                        t[0] = equationForConditions(conditionsInput[c]);
+                        temp[i] = t;
+                        c++;
+                    }
+                }
+                equation = temp;
+            }
+            //Если условие через систему уравнений
             buildTruthTable(constants.Length + unknows.Length);
             getVectorBF(equation, constants + unknows);
 
@@ -26,11 +44,19 @@ namespace SolutionSystemEquationMultioperations
             {
                 vector += thurthTable[i][thurthTable[i].Length - 1];
             }
+            //0000 0011 0101 0110
+            //1111 0011 0101 1111
             // Для быстрой отладки
 
             if (solvabilityTest(constants, unknows, conditionsInput))
             {
-                if (conditions.Count != 0)
+                //Если условие заданы отдельно
+                //if (conditions.Count != 0)
+                //Если условие заданы отдельно
+
+                //Если условие через систему уравнений
+                if (conditions != null)
+                //Если условие через систему уравнений
                 {
                     foreach (KeyValuePair<string, int[]> kvpCondition in conditions)
                     {
@@ -51,6 +77,20 @@ namespace SolutionSystemEquationMultioperations
                 return null;
             }
             return resultsPairs;
+        }
+
+        private string equationForConditions(string condition)
+        {
+            string equationConditions = "";
+            string operatorCondition = condition.Split('|')[0];
+            string[] arguments = condition.Split('|')[1].Split(',');
+            switch (operatorCondition)
+            {
+                case "!=":
+                    equationConditions += $"{arguments[0]}{arguments[1]}V-{arguments[0]}-{arguments[1]}<0";
+                    break;
+            }
+            return equationConditions;
         }
 
         private void buildTruthTable(int countAgruments)
@@ -111,6 +151,7 @@ namespace SolutionSystemEquationMultioperations
                                 {
                                     tempRes[j] = 1;
                                     break;
+
                                 }
                             }
                         }
@@ -130,9 +171,23 @@ namespace SolutionSystemEquationMultioperations
         private int getValueOnSet(string equation, int set)
         {
             int res = 1;
+            bool neg = false;
             foreach (char e in equation)
             {
-                res *= thurthTable[set][keysArguments[e]];
+                if (e == '-')
+                {
+                    neg = true;
+                    continue;
+                }
+                if (neg)
+                {
+                    int t = thurthTable[set][keysArguments[e]];
+                    if (t == 0) t = 1;
+                    else t = 0;
+                    res *= t;
+                    neg = false;
+                }
+                else res *= thurthTable[set][keysArguments[e]];
                 if (res == 0) break;
             }
             return res;
@@ -158,17 +213,6 @@ namespace SolutionSystemEquationMultioperations
                     countResidual++;
                 }
             }
-            //for (int i = 0; i < residual.Length - 1; i++)
-            //{
-            //    for (int j = 0; j < residual[i].Length; j++)
-            //    {
-            //        res *= residual[i][j];
-            //        if (res == 0) break;
-            //    }
-            //    residual[residual.Length - 1][i] = res;
-            //    res = 1;
-            //}
-            //countResidual = 0;
             for (int i = 0; i < sizeCol; i++)
             {
                 for (int j = 0; j < sizeRow; j++)
@@ -181,80 +225,104 @@ namespace SolutionSystemEquationMultioperations
                 countResidual++;
             }
 
-            for (int i = 0; i < residual.Length; i++)
+            for (int i = 0; i < residual[residual.Length - 1].Length; i++)
             {
-                if (residual[i][residual[i].Length - 1] == 0) flag = true;
-            }
-            //
-            if (conditionInput != null)
-            {
-                if (flag)
+                //Если условие заданы отдельно
+                //if (residual[residual.Length - 1][i] == 0) flag = true;
+                //Если условие заданы отдельно
+
+                //Если условие через систему уравнений
+                if (residual[residual.Length - 1][i] == 0)
                 {
                     string binarySet_string = "", temp = "";
-                    for (int i = 0; i < residual[residual.Length - 1].Length; i++)
+                    int[] binarySet_int = new int[constants.Length];
+                    binarySet_string = Convert.ToString(i, 2);
+                    if (binarySet_string.Length < constants.Length)
                     {
-                        int[] binarySet_int = new int[constants.Length];
-                        binarySet_string = Convert.ToString(i, 2);
-                        if (binarySet_string.Length < constants.Length)
-                        {
-                            for (int r = constants.Length - binarySet_string.Length; r > 0; r--) temp += "0"; //?
-                            binarySet_string = temp + binarySet_string;
-                            temp = "";
-                        }
-                        for (int j = 0; j < binarySet_string.Length; j++)
-                        {
-                            binarySet_int[j] = binarySet_string[j] - '0';
-                            //temp += constants[j] + " = " + binarySet_string[j] + " ";
-                        }
-                        binarySet_string = constants + binarySet_string;
-                        conditions.Add(binarySet_string, binarySet_int);
+                        for (int r = constants.Length - binarySet_string.Length; r > 0; r--) temp += "0"; //?
+                        binarySet_string = temp + binarySet_string;
                     }
-
-                    Dictionary<string, int[]> cloneConditions = new Dictionary<string, int[]>();
-                    foreach (KeyValuePair<string, int[]> kvp_condition in conditions) cloneConditions.Add(kvp_condition.Key, kvp_condition.Value);
-
-                    for (int i = 0; i < conditionInput.Length; i++)
-                    {
-                        string operatorCondition = conditionInput[i].Split('|')[0];
-                        string arguments = conditionInput[i].Split('|')[1];
-                        foreach (char c in arguments) if (c != ',') temp += c;
-                        arguments = temp;
-                        temp = "";
-
-                        switch (operatorCondition)
-                        {
-                            case "!=":
-                                foreach (KeyValuePair<string, int[]> kvp_condition in cloneConditions)
-                                {
-                                    string key = kvp_condition.Key;
-                                    int[] value = kvp_condition.Value;
-                                    int firstValue = -1;
-                                    foreach (char c in arguments)
-                                    {
-                                        for (int j = 0; j < key.Length; j++)
-                                        {
-                                            if (c == key[j])
-                                            {
-                                                if (firstValue == -1)
-                                                {
-                                                    firstValue = value[j];
-                                                    break;
-                                                }
-                                                else if (firstValue == value[j])
-                                                {
-                                                    conditions.Remove(kvp_condition.Key);
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                break;
-                        }
-                    }
+                    for (int j = 0; j < binarySet_string.Length; j++) binarySet_int[j] = binarySet_string[j] - '0';
+                    binarySet_string = constants + binarySet_string;
+                    conditions.Add(binarySet_string, binarySet_int);
                 }
+                //Если условие через систему уравнений
             }
-            //
+            //Если условие через систему уравнений
+            if (conditions.Count != 0) flag = true;
+            if (conditions.Count == residual[residual.Length - 1].Length) conditions = null;
+            //Если условие через систему уравнений
+
+            //Если условие заданы отдельно
+            //if (conditionInput != null)
+            //{
+            //    if (flag)
+            //    {
+            //        string binarySet_string = "", temp = "";
+            //        for (int i = 0; i < residual[residual.Length - 1].Length; i++)
+            //        {
+            //            int[] binarySet_int = new int[constants.Length];
+            //            binarySet_string = Convert.ToString(i, 2);
+            //            if (binarySet_string.Length < constants.Length)
+            //            {
+            //                for (int r = constants.Length - binarySet_string.Length; r > 0; r--) temp += "0"; //?
+            //                binarySet_string = temp + binarySet_string;
+            //                temp = "";
+            //            }
+            //            for (int j = 0; j < binarySet_string.Length; j++)
+            //            {
+            //                binarySet_int[j] = binarySet_string[j] - '0';
+            //                //temp += constants[j] + " = " + binarySet_string[j] + " ";
+            //            }
+            //            binarySet_string = constants + binarySet_string;
+            //            conditions.Add(binarySet_string, binarySet_int);
+            //        }
+
+            //        Dictionary<string, int[]> cloneConditions = new Dictionary<string, int[]>();
+            //        foreach (KeyValuePair<string, int[]> kvp_condition in conditions) cloneConditions.Add(kvp_condition.Key, kvp_condition.Value);
+
+            //        for (int i = 0; i < conditionInput.Length; i++)
+            //        {
+            //            string operatorCondition = conditionInput[i].Split('|')[0];
+            //            string arguments = conditionInput[i].Split('|')[1];
+            //            foreach (char c in arguments) if (c != ',') temp += c;
+            //            arguments = temp;
+            //            temp = "";
+
+            //            switch (operatorCondition)
+            //            {
+            //                case "!=":
+            //                    foreach (KeyValuePair<string, int[]> kvp_condition in cloneConditions)
+            //                    {
+            //                        string key = kvp_condition.Key;
+            //                        int[] value = kvp_condition.Value;
+            //                        int firstValue = -1;
+            //                        foreach (char c in arguments)
+            //                        {
+            //                            for (int j = 0; j < key.Length; j++)
+            //                            {
+            //                                if (c == key[j])
+            //                                {
+            //                                    if (firstValue == -1)
+            //                                    {
+            //                                        firstValue = value[j];
+            //                                        break;
+            //                                    }
+            //                                    else if (firstValue == value[j])
+            //                                    {
+            //                                        conditions.Remove(kvp_condition.Key);
+            //                                        break;
+            //                                    }
+            //                                }
+            //                            }
+            //                        }
+            //                    }
+            //                    break;
+            //            }
+            //        }
+            //    }
+            //}
+            //Если условие заданы отдельно
             return flag;
         }
 

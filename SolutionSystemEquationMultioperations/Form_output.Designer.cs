@@ -32,6 +32,7 @@
             this.label_resultEquation = new System.Windows.Forms.Label();
             this.textBox_equation = new System.Windows.Forms.TextBox();
             this.label_equation = new System.Windows.Forms.Label();
+            this.button_test = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBox_resualEquation
@@ -40,8 +41,9 @@
             this.textBox_resualEquation.Location = new System.Drawing.Point(17, 123);
             this.textBox_resualEquation.Multiline = true;
             this.textBox_resualEquation.Name = "textBox_resualEquation";
-            this.textBox_resualEquation.Size = new System.Drawing.Size(684, 285);
+            this.textBox_resualEquation.Size = new System.Drawing.Size(590, 285);
             this.textBox_resualEquation.TabIndex = 7;
+            this.textBox_resualEquation.Text = "xy";
             // 
             // label_resultEquation
             // 
@@ -57,10 +59,10 @@
             // 
             this.textBox_equation.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.textBox_equation.Location = new System.Drawing.Point(17, 37);
-            this.textBox_equation.Multiline = true;
             this.textBox_equation.Name = "textBox_equation";
-            this.textBox_equation.Size = new System.Drawing.Size(771, 46);
+            this.textBox_equation.Size = new System.Drawing.Size(771, 31);
             this.textBox_equation.TabIndex = 9;
+            this.textBox_equation.Text = "xyVabVxyab";
             // 
             // label_equation
             // 
@@ -72,11 +74,22 @@
             this.label_equation.TabIndex = 8;
             this.label_equation.Text = "Уравнение";
             // 
+            // button_test
+            // 
+            this.button_test.Location = new System.Drawing.Point(630, 123);
+            this.button_test.Name = "button_test";
+            this.button_test.Size = new System.Drawing.Size(75, 23);
+            this.button_test.TabIndex = 10;
+            this.button_test.Text = "Тест";
+            this.button_test.UseVisualStyleBackColor = true;
+            this.button_test.Click += new System.EventHandler(this.button_test_Click);
+            // 
             // Form_Output
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.button_test);
             this.Controls.Add(this.textBox_equation);
             this.Controls.Add(this.label_equation);
             this.Controls.Add(this.textBox_resualEquation);
@@ -94,5 +107,6 @@
         private System.Windows.Forms.Label label_resultEquation;
         private System.Windows.Forms.TextBox textBox_equation;
         private System.Windows.Forms.Label label_equation;
+        private System.Windows.Forms.Button button_test;
     }
 }

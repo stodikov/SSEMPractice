@@ -88,7 +88,7 @@ namespace SolutionSystemEquationMultioperations.helpers
             return result;
         }
 
-        private string[] deleteRepeatElements(string[] input)
+        public string[] deleteRepeatElements(string[] input)
         {
             string[] result = new string[input.Length];
             int count = 0;
@@ -96,12 +96,7 @@ namespace SolutionSystemEquationMultioperations.helpers
             {
                 string[] temp = input[s].Split('V');
                 string resultTemp = "";
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    temp[i] = new string(temp[i].Distinct().ToArray());
-                    //if (i != temp.Length - 1) resultTemp += temp[i] + "V";
-                    //else resultTemp += temp[i];
-                }
+                for (int i = 0; i < temp.Length; i++) temp[i] = distinctWithNegative(temp[i]);
                 result[s] = resultTemp;
 
                 if (temp.Length >= 2)
@@ -124,10 +119,7 @@ namespace SolutionSystemEquationMultioperations.helpers
                                         }
                                     }
                                 }
-                                if (countEq == temp[j].Length)
-                                {
-                                    temp[j] = "-1";
-                                }
+                                if (countEq == temp[j].Length) temp[j] = "-1";
                             }
                         }
                     }
@@ -157,46 +149,107 @@ namespace SolutionSystemEquationMultioperations.helpers
                 else result[s] += temp[0];
             }
 
-            //for (int s = 0; s < result.Length; s++)
-            //{
-            //    count = 0;
-            //    string[] temp = result[s].Split('V');
-            //    if (temp.Length > 2)
-            //    {
-            //        for (int i = 0; i < temp.Length; i++)
-            //        {
-            //            for (int j = 0; j < temp.Length; j++)
-            //            {
-            //                if (i != j && temp[i] == temp[j]) temp[j] = "-1";
-            //            }
-            //        }
-            //        for (int i = 0; i < temp.Length; i++)
-            //        {
-            //            if (temp[i] != "-1") count++;
-            //        }
-            //        if (count > 0)
-            //        {
-            //            string[] conjunctions = new string[count];
-            //            string form = "";
-            //            count = 0;
-            //            for (int i = 0; i < temp.Length; i++)
-            //            {
-            //                if (temp[i] != "-1")
-            //                {
-            //                    conjunctions[count] = temp[i];
-            //                    count++;
-            //                }
-            //            }
-            //            for (int i = 0; i < count; i++)
-            //            {
-            //                if ((i + 1) == count) form += conjunctions[i];
-            //                else form += conjunctions[i] + "V";
-            //            }
-            //            result[s] = form;
-            //        }
-            //    }
-            //}
             //проверка всего результирующего массива на одинаковые конъюнкции
+            return result;
+        }
+
+        public string[] deleteRepeatElementsAM(string[] input)
+        {
+            string[] result = new string[input.Length];
+            int count = 0;
+            for (int s = 0; s < input.Length; s++)
+            {
+                string[] temp = input[s].Split('V');
+                string resultTemp = "";
+                for (int i = 0; i < temp.Length; i++) temp[i] = distinctWithNegative(temp[i]);
+                result[s] = resultTemp;
+
+                if (temp.Length >= 2)
+                {
+                    for (int i = 0; i < temp.Length; i++)
+                    {
+                        for (int j = 0; j < temp.Length; j++)
+                        {
+                            if (i != j && temp[i].Length == temp[j].Length && temp[i] != "-1" && temp[j] != "-1")
+                            {
+                                int countEq = 0;
+                                string[] splitOne = temp[i].Split('&');
+                                string[] splitTwo = temp[j].Split('&');
+                                foreach (string s1 in splitOne)
+                                {
+                                    foreach (string s2 in splitTwo)
+                                    {
+                                        if (s1 == s2) {
+                                            countEq++;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (countEq == splitTwo.Length) temp[j] = "-1";
+                            }
+                        }
+                    }
+
+                    for (int i = 0; i < temp.Length; i++) if (temp[i] != "-1") count++;
+                    if (count > 0)
+                    {
+                        string[] conjunctions = new string[count];
+                        string form = "";
+                        count = 0;
+                        for (int i = 0; i < temp.Length; i++)
+                        {
+                            if (temp[i] != "-1")
+                            {
+                                conjunctions[count] = temp[i];
+                                count++;
+                            }
+                        }
+                        for (int i = 0; i < count; i++)
+                        {
+                            if ((i + 1) == count) form += conjunctions[i];
+                            else form += conjunctions[i] + "V";
+                        }
+                        result[s] = form;
+                    }
+                }
+                else result[s] += temp[0];
+            }
+
+            //проверка всего результирующего массива на одинаковые конъюнкции
+            return result;
+        }
+
+        public string distinctWithNegative(string input) //Функция на костыле
+        {
+            string result = "";
+            if (input.Contains('&'))
+            {
+                string[] split = input.Split('&');
+                foreach (string str in split)
+                    if (!result.Contains(str)) result += str + "&";
+                result = result.TrimEnd('&');
+            }
+            else
+            {
+                bool neg = false;
+                foreach (char e in input)
+                {
+                    if (!result.Contains(e) && e != '-' && !neg) result += e;
+                    else if (!result.Contains(e) && e != '-' && neg)
+                    {
+                        result += $"-{e}";
+                        neg = false;
+                    }
+                    else if (e == '-') neg = true;
+                    else if (result.Contains(e))
+                    {
+                        int index = result.IndexOf(e);
+                        if (index > 0 && result[index - 1] == '-' && !neg) return "";
+                        if (index > 0 && result[index - 1] != '-' && neg) return "";
+                        if (index == 0 && neg) return "";
+                    }
+                }
+            }
             return result;
         }
     }

@@ -57,9 +57,11 @@
       <DependentUpon>Form_Input.cs</DependentUpon>
     </Compile>
     <Compile Include="helpers\forTMToSEBF.cs" />
+    <Compile Include="helpers\GeneralFunctionsAnalyticalMethod.cs" />
     <Compile Include="helpers\parseMultioperations.cs" />
+    <Compile Include="methods\AnalyticalMethod.cs" />
     <Compile Include="Multioperation.cs" />
-    <Compile Include="NumericalMethod.cs" />
+    <Compile Include="methods\NumericalMethod.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controller.cs" />

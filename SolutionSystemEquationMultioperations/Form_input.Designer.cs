@@ -51,8 +51,7 @@
             this.textBox_Equation.Name = "textBox_Equation";
             this.textBox_Equation.Size = new System.Drawing.Size(264, 180);
             this.textBox_Equation.TabIndex = 1;
-            this.textBox_Equation.Text = "m_1<m_2\r\nm_1=m1|m_21,m_41,m_31\r\nm_2=m1|m_42,m_22,m_32\r\nm_21=m2|z,c\r\nm_41=m4|k\r\nm_" +
-    "31=m3|k,z,c\r\nm_42=m4|c\r\nm_22=m2|c,k\r\nm_32=m3|c,z,k";
+            this.textBox_Equation.Text = "g_1<g_2\r\ng_1=g|h_1,s_1\r\ng_2=g|c,z\r\nh_1=h|z,c\r\ns_1=s|c";
             // 
             // label_leftSideEquation
             // 
@@ -112,7 +111,7 @@
             this.textBox_Multioperations.Name = "textBox_Multioperations";
             this.textBox_Multioperations.Size = new System.Drawing.Size(264, 180);
             this.textBox_Multioperations.TabIndex = 8;
-            this.textBox_Multioperations.Text = "m1=13201332\r\nm2=2112\r\nm3=33200112\r\nm4=13";
+            this.textBox_Multioperations.Text = "h=1332\r\ns=21\r\ng=1002";
             // 
             // textBox_constants
             // 
@@ -122,7 +121,7 @@
             this.textBox_constants.Name = "textBox_constants";
             this.textBox_constants.Size = new System.Drawing.Size(264, 61);
             this.textBox_constants.TabIndex = 9;
-            this.textBox_constants.Text = "c|a,b\r\nk|s,w";
+            this.textBox_constants.Text = "c|a,b";
             // 
             // label_constants
             // 
@@ -172,7 +171,7 @@
             this.textBox_conditions.Name = "textBox_conditions";
             this.textBox_conditions.Size = new System.Drawing.Size(264, 61);
             this.textBox_conditions.TabIndex = 13;
-            this.textBox_conditions.Text = "!=|a,b\r\n!=|s,w";
+            this.textBox_conditions.Text = "!=|a,b";
             // 
             // Form_Input
             // 

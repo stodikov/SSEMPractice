@@ -17,6 +17,8 @@ namespace SolutionSystemEquationMultioperations
         public Form_Input()
         {
             InitializeComponent();
+            //Form_Output formOutput = new Form_Output();
+            //formOutput.Show();
         }
 
         private void Form_SolvingOfSystemEquationOfTheoryMultioperations_Load(object sender, EventArgs e)

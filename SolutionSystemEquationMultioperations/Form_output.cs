@@ -11,6 +11,8 @@ namespace SolutionSystemEquationMultioperations
 {
     public partial class Form_Output : Form
     {
+        methods.AnalyticalMethod AM = new methods.AnalyticalMethod();
+
         public Form_Output()
         {
             InitializeComponent();
@@ -36,6 +38,13 @@ namespace SolutionSystemEquationMultioperations
             //        textBox_resualEquation.Text += "\r\n";
             //    }
             //}
+        }
+
+        private void button_test_Click(object sender, EventArgs e)
+        {
+            string equation = textBox_equation.Text;
+            string unknows = textBox_resualEquation.Text;
+            //AM.getDerivativesGivesUnknows(equation, unknows);
         }
     }
 }
