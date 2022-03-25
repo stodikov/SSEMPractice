@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -12,6 +13,7 @@ namespace SolutionSystemEquationMultioperations
     public partial class Form_Input : Form
     {
         helpers.parseMultioperations helpers = new helpers.parseMultioperations();
+        helpers.forTMToSEBF TMT = new helpers.forTMToSEBF();
         Controller controller = new Controller();
 
         public Form_Input()
@@ -28,14 +30,19 @@ namespace SolutionSystemEquationMultioperations
 
         private void button_getResualtEquation_Click(object sender, EventArgs e)
         {
-            string[] splitInput = textBox_Equation.Text.Replace("\r", "").Split('\n');
+            string equationInput = textBox_Equation.Text;
             string[] multioperationsInput = textBox_Multioperations.Text.Replace("\r", "").Split('\n');
             string[] constantsInput = textBox_constants.Text.Replace("\r", "").Split('\n');
             string[] unknowsInput = textBox_unknows.Text.Replace("\r", "").Split('\n');
             string[] conditionsInput = textBox_conditions.Text.Replace("\r", "").Split('\n');
+            string[] splitInput;
             string equation = "", constants = "", unknows = "";
             Dictionary<string, Multioperation> multioperations = new Dictionary<string, Multioperation>();
             Dictionary<string, int[]> designationAndVector = new Dictionary<string, int[]>();
+
+            ArrayList list = TMT.decompositionEquation(equationInput);
+            splitInput = new string[list.Count];
+            for (int i = 0; i < splitInput.Length; i++) splitInput[i] = list[i].ToString();
 
             foreach (string s in multioperationsInput)
             {

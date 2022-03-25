@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 
@@ -7,6 +8,62 @@ namespace SolutionSystemEquationMultioperations.helpers
 {
     class forTMToSEBF
     {
+        //"m1(m2(z,c),m4(k),m3(k,z,c))<m2(m4(c),m2(c,k),m3(c,z,k))"
+        //"m1(m2(z,c),m4(k),m3(k,z,c))"
+        Dictionary<string, int> designations = new Dictionary<string, int>();
+        ArrayList result = new ArrayList();
+        int count = 0;
+        string mainEquation = "";
+
+        public ArrayList decompositionEquation(string equation)
+        {
+            decomposition(equation);
+            return result;
+        }
+
+        public string decomposition(string equation)
+        {
+            string function = "", functionArguments = "", arguments = "", codeFunction = "";
+            while (count < equation.Length)
+            {
+                switch(equation[count])
+                {
+                    case '(':
+                        count++;
+                        arguments = decomposition(equation);
+                        if (designations.ContainsKey(function))
+                        {
+                            codeFunction = $"{function}_{Convert.ToString(designations[function])}";
+                            designations[function] = designations[function] + 1;
+                        }
+                        else
+                        {
+                            designations.Add(function, 1);
+                            codeFunction = $"{function}_0";
+                        }
+                        result.Add($"{codeFunction}={function}|{arguments}");
+                        functionArguments = functionArguments.Substring(0, functionArguments.LastIndexOf(function)) + codeFunction;
+                        function = "";
+                        break;
+                    case ')':
+                        return functionArguments;
+                    case '<':
+                        function = "";
+                        functionArguments = "";
+                        mainEquation = result[result.Count - 1].ToString().Split('=')[0] + '<';
+                        break;
+                    default:
+                        if (equation[count] != ',') function += equation[count];
+                        functionArguments += equation[count];
+                        break;
+                }
+                count++;
+            }
+            mainEquation += result[result.Count - 1].ToString().Split('=')[0];
+            result.Add(mainEquation);
+            return "";
+        }
+
         public void getEquationPresent(Dictionary<string, Multioperation> multioperations, string key)
         {
             string[] arguments = multioperations[key].arguments;

@@ -51,7 +51,7 @@
             this.textBox_Equation.Name = "textBox_Equation";
             this.textBox_Equation.Size = new System.Drawing.Size(264, 180);
             this.textBox_Equation.TabIndex = 1;
-            this.textBox_Equation.Text = "g_1<g_2\r\ng_1=g|h_1,s_1\r\ng_2=g|c,z\r\nh_1=h|z,c\r\ns_1=s|c";
+            this.textBox_Equation.Text = "g(h(z,c),s(c))<g(c,z)";
             // 
             // label_leftSideEquation
             // 
