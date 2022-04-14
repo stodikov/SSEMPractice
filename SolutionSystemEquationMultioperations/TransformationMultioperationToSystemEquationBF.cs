@@ -7,10 +7,10 @@ namespace SolutionSystemEquationMultioperations
 {
     class TransformationMultioperationToSystemEquationBF
     {
-        public string[][] transformation(Dictionary<string, Multioperation> multioperations, string equation)
+        public string[][] transformation(int rang, Dictionary<string, Multioperation> multioperations, string equation)
         {
             string[] equationSplit = equation.Split('<');
-            redefinition(multioperations);
+            redefinition(rang, multioperations);
             string[][] equationLeftPart = multioperations[equationSplit[0]].equationPresent;
             string[][] equationRightPart = multioperations[equationSplit[1]].equationPresent;
             string[][] result = new string[equationLeftPart.Length][];
@@ -25,7 +25,7 @@ namespace SolutionSystemEquationMultioperations
             return result;
         }
 
-        private void redefinition(Dictionary<string, Multioperation> multioperations)
+        private void redefinition(int rang, Dictionary<string, Multioperation> multioperations)
         {
             helpers.forTMToSEBF TMToSEBF = new helpers.forTMToSEBF();
             bool flag = true;
@@ -45,7 +45,7 @@ namespace SolutionSystemEquationMultioperations
                         }
                         if (countEquations == arguments.Length)
                         {
-                            TMToSEBF.getEquationPresent(multioperations, kvp.Key);
+                            TMToSEBF.getEquationPresent(rang, multioperations, kvp.Key);
                             count++;
                         }
                     }

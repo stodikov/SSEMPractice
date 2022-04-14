@@ -30,13 +30,17 @@ namespace SolutionSystemEquationMultioperations
 
         private void button_getResualtEquation_Click(object sender, EventArgs e)
         {
-            string equationInput = textBox_Equation.Text;
-            string[] multioperationsInput = textBox_Multioperations.Text.Replace("\r", "").Split('\n');
-            string[] constantsInput = textBox_constants.Text.Replace("\r", "").Split('\n');
-            string[] unknowsInput = textBox_unknows.Text.Replace("\r", "").Split('\n');
-            string[] conditionsInput = textBox_conditions.Text.Replace("\r", "").Split('\n');
+            char[] forTrim = new char[] { '\r', '\n', ' ' };
+            string equationInput = textBox_Equation.Text.Trim(forTrim);
+            string[] multioperationsInput = textBox_Multioperations.Text.Trim(forTrim).Replace("\r", "").Split('\n');
+            string[] constantsInput = textBox_constants.Text.Trim(forTrim).Replace("\r", "").Split('\n');
+            string[] unknowsInput = textBox_unknows.Text.Trim(forTrim).Replace("\r", "").Split('\n');
+            string[] conditionsInput = textBox_conditions.Text.Trim(forTrim).Replace("\r", "").Split('\n');
+            int rang = Convert.ToInt32(textBox_Rang.Text);
             string[] splitInput;
-            string equation = "", constants = "", unknows = "";
+            string equation = "", constants = "", unknows = "",
+                method = radioButton_AM.Checked ? "analytical" : "numeric",
+                formatAnswer = radioButton_FormatHorizontal.Checked ? "horizontal" : "vertical";
             Dictionary<string, Multioperation> multioperations = new Dictionary<string, Multioperation>();
             Dictionary<string, int[]> designationAndVector = new Dictionary<string, int[]>();
 
@@ -47,9 +51,20 @@ namespace SolutionSystemEquationMultioperations
             foreach (string s in multioperationsInput)
             {
                 string[] input = s.Split('=');
-                int[] multioperation = new int[input[1].Length];
-                for (int i = 0; i < input[1].Length; i++) multioperation[i] = input[1][i] - '0';
-                designationAndVector.Add(input[0], multioperation);
+
+                if (rang < 4)
+                {
+                    int[] multioperation = new int[input[1].Length];
+                    for (int i = 0; i < input[1].Length; i++) multioperation[i] = input[1][i] - '0';
+                    designationAndVector.Add(input[0], multioperation);
+                }
+                else
+                {
+                    string[] elementsMO = input[1].Split(new char[] { ',', ' ' });
+                    int[] multioperation = new int[elementsMO.Length];
+                    for (int i = 0; i < elementsMO.Length; i++) multioperation[i] = Convert.ToInt32(elementsMO[i]);
+                    designationAndVector.Add(input[0], multioperation);
+                }
             }
 
             foreach (string s in splitInput)
@@ -63,7 +78,7 @@ namespace SolutionSystemEquationMultioperations
 
                     if (designationAndVector.ContainsKey(designationMultioperation))
                     {
-                        int[][] codeRepresentation = helpers.parseMOtoVectorsRang2(designationAndVector[designationMultioperation]);
+                        int[][] codeRepresentation = helpers.parseMOtoVectors(designationAndVector[designationMultioperation], rang);
                         Multioperation newMO = new Multioperation(designationMultioperation, codeRepresentation, arguments, null);
                         multioperations.Add(designation, newMO);
                     }
@@ -96,71 +111,42 @@ namespace SolutionSystemEquationMultioperations
                 multioperations.Add(designation, new Multioperation(designation, null, null, newEquation));
             }
 
-            Dictionary<string, string[][]> resultEquation = controller.start(multioperations, conditionsInput, equation, constants, unknows);
+            Dictionary<string, string[][]> resultEquation = controller.start(rang, multioperations, conditionsInput, equation, constants, unknows, method);
 
+            textBox_resualEquation.Text = "";
             foreach (KeyValuePair<string, string[][]> kvpRes in resultEquation)
             {
                 string condition = kvpRes.Key;
                 string[][] resValue = kvpRes.Value;
-                textBox_resualEquation.Text += condition + "\r\n";
-                for (int i = 0; i < resValue.Length; i++)
+                string answer = "";
+                int midCondition = condition.Length / 2;
+
+                if (condition == "no conditions" || condition == "") answer += "Условий нет";
+                else
                 {
-                    for (int j = 0; j < unknows.Length; j++)
-                    {
-                        textBox_resualEquation.Text += unknows[j] + " = " + resValue[i][j] + "\r\n";
-                    }
-                    textBox_resualEquation.Text += "\r\n";
+                    answer += "При ";
+                    for (int i = 0; i < midCondition; i++) answer += $"{condition[i]} = {condition[i + midCondition]}, ";
                 }
+                answer = answer.TrimEnd(new char[] { ' ', ',' }) + "\r\n";
+                if (formatAnswer == "horizontal")
+                {
+                    for (int i = 0; i < unknows.Length; i++)
+                    {
+                        for (int j = 0; j < resValue.Length; j++) answer += unknows[i] + " = " + resValue[j][i] + "   ";
+                        answer += "\r\n";
+                    }
+                    answer += "\r\n";
+                }
+                else
+                {
+                    for (int i = 0; i < resValue.Length; i++)
+                    {
+                        for (int j = 0; j < unknows.Length; j++) answer += unknows[j] + " = " + resValue[i][j] + "\r\n";
+                        answer += "\r\n";
+                    }
+                }
+                textBox_resualEquation.Text += answer;
             }
-
-
-            //foreach (KeyValuePair<string, Multioperation> kvp in multioperations)
-            //{
-            //    textBox_resualEquation.Text += kvp.Key + "\r\n";
-            //}
-            //Dictionary<string,Multioperation>
-
-            /*Разбиение строки по мультиоперациям через рекурсивную функцию.
-             * g(h(z,c),s(c))<g(c,z)
-               g(
-               h(
-               z,c) запомнили h(z,c)
-               g(,s(
-               c) запомнили s(c)
-               g(,) запомнили g(h(z,c),s(c))
-
-               g(
-               c,z) запомнили g(c,z)
-               
-               h(z,c) s(c) g(h(z,c),s(c))
-             */
-
-            /* 
-             Или получение уравнения через кодировку
-             g(h(z,c),s(c))<g(c,z)
-
-             g1(h1,s1)<g2(c,z)
-             g1=g(h1,s1)
-             g2=g(c,z)
-             h1=h(z,c)
-             s1=s(c)
-            */
-
-            /* 
-             Объект функция
-               функция - g
-               параметр1 - h
-               параметр2 - s
-               матричное представление - null
-
-
-              функция - с
-              параметр1 - null
-              параметр2 - null
-              матричное представление - есть
-
-            через цикл заполнить все функции
-             */
         }
     }
 }

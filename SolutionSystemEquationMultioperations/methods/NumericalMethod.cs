@@ -12,71 +12,65 @@ namespace SolutionSystemEquationMultioperations.methods
         Dictionary<string, int[]> conditions = new Dictionary<string, int[]>();
         Dictionary<string, string[][]> resultsPairs = new Dictionary<string, string[][]>();
 
-        public Dictionary<string, string[][]> getSolution(string[][] equation, string constants, string unknows, string[] conditionsInput = null)
+        public Dictionary<string, string[][]> getSolution(int rang, string[][] equation, string constants, string unknows, string[] conditionsInput = null)
         {
             string[][] pairs;
             string[][] res = null;
-            //Если условие через систему уравнений
-            if (conditionsInput != null)
-            {
-                string[][] temp = new string[equation.Length + conditionsInput.Length][];
-                int c = 0;
-                for (int i = 0; i < temp.Length; i++)
-                {
-                    if (i < equation.Length) temp[i] = equation[i];
-                    else
-                    {
-                        string[] t = new string[1];
-                        t[0] = equationForConditions(conditionsInput[c]);
-                        temp[i] = t;
-                        c++;
-                    }
-                }
-                equation = temp;
-            }
-            //Если условие через систему уравнений
+
+            keysArguments.Clear();
+            conditions.Clear();
+            resultsPairs.Clear();
+
+            if (conditionsInput != null) equation = addConditionsToEquation(equation, conditionsInput);
+
             buildTruthTable(constants.Length + unknows.Length);
             getVectorBF(equation, constants + unknows);
 
             // Для быстрой отладки
-            string vector = "";
-            for (int i = 0; i < thurthTable.Length; i++)
-            {
-                vector += thurthTable[i][thurthTable[i].Length - 1];
-            }
-            //0000 0011 0101 0110
-            //1111 0011 0101 1111
+            //string vector = "";
+            //for (int i = 0; i < thurthTable.Length; i++)
+            //{
+            //    vector += thurthTable[i][thurthTable[i].Length - 1];
+            //}
             // Для быстрой отладки
 
-            if (solvabilityTest(constants, unknows, conditionsInput))
-            {
-                //Если условие заданы отдельно
-                //if (conditions.Count != 0)
-                //Если условие заданы отдельно
+            if (!solvabilityTest(constants, unknows, conditionsInput)) return null;
 
-                //Если условие через систему уравнений
-                if (conditions != null)
-                //Если условие через систему уравнений
+            if (conditions.Count != 0)
+            {
+                foreach (KeyValuePair<string, int[]> kvpCondition in conditions)
                 {
-                    foreach (KeyValuePair<string, int[]> kvpCondition in conditions)
-                    {
-                        pairs = getPairsForResult(constants, unknows, kvpCondition);
-                        res = getResultPairs(pairs, unknows);
-                        resultsPairs.Add(kvpCondition.Key, res);
-                    }
-                }
-                else
-                {
-                    pairs = getPairsForResult(constants, unknows);
-                    res = getResultPairs(pairs, unknows);
-                    resultsPairs.Add("no conditions", res);
+                    pairs = getPairsForResult(constants, unknows, kvpCondition);
+                    res = getResultPairs(rang, pairs, unknows);
+                    resultsPairs.Add(kvpCondition.Key, res);
                 }
             }
             else
             {
-                return null;
+                pairs = getPairsForResult(constants, unknows);
+                res = getResultPairs(rang, pairs, unknows);
+                resultsPairs.Add("no conditions", res);
             }
             return resultsPairs;
+        }
+
+        private string[][] addConditionsToEquation(string[][] equation, string[] conditionsInput)
+        {
+            string[][] temp = new string[equation.Length + conditionsInput.Length][];
+            int c = 0;
+            for (int i = 0; i < temp.Length; i++)
+            {
+                if (i < equation.Length) temp[i] = equation[i];
+                else
+                {
+                    string[] t = new string[1];
+                    t[0] = equationForConditions(conditionsInput[c]);
+                    temp[i] = t;
+                    c++;
+                }
+            }
+            equation = temp;
+            return equation;
         }
 
         private string equationForConditions(string condition)
@@ -182,8 +176,7 @@ namespace SolutionSystemEquationMultioperations.methods
                 if (neg)
                 {
                     int t = thurthTable[set][keysArguments[e]];
-                    if (t == 0) t = 1;
-                    else t = 0;
+                    t = (t == 0) ? 1 : 0;
                     res *= t;
                     neg = false;
                 }
@@ -250,7 +243,7 @@ namespace SolutionSystemEquationMultioperations.methods
             }
             //Если условие через систему уравнений
             if (conditions.Count != 0) flag = true;
-            if (conditions.Count == residual[residual.Length - 1].Length) conditions = null;
+            if (conditions.Count == residual[residual.Length - 1].Length) conditions.Clear();
             //Если условие через систему уравнений
 
             //Если условие заданы отдельно
@@ -386,7 +379,7 @@ namespace SolutionSystemEquationMultioperations.methods
             return res;
         }
 
-        private string[][] getResultPairs(string[][] pairs, string unknows)
+        private string[][] getResultPairs(int rang, string[][] pairs, string unknows)
         {
             int countResPairs = pairs[0].Length, slice = 0, count = 0;
             string[][] resPairs;
@@ -396,8 +389,7 @@ namespace SolutionSystemEquationMultioperations.methods
                 for (int i = 0; i < resPairs.Length; i++) resPairs[i] = new string[unknows.Length];
                 for (int i = 0; i < pairs[0].Length; i++)
                 {
-                    resPairs[count][0] += pairs[0][i][0];
-                    resPairs[count][1] += pairs[0][i][1];
+                    for (int r = 0; r < rang; r++) resPairs[count][r] += pairs[0][i][r];
                     count++;
                 }
             }

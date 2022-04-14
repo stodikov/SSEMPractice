@@ -8,8 +8,6 @@ namespace SolutionSystemEquationMultioperations.helpers
 {
     class forTMToSEBF
     {
-        //"m1(m2(z,c),m4(k),m3(k,z,c))<m2(m4(c),m2(c,k),m3(c,z,k))"
-        //"m1(m2(z,c),m4(k),m3(k,z,c))"
         Dictionary<string, int> designations = new Dictionary<string, int>();
         ArrayList result = new ArrayList();
         int count = 0;
@@ -17,6 +15,11 @@ namespace SolutionSystemEquationMultioperations.helpers
 
         public ArrayList decompositionEquation(string equation)
         {
+            designations.Clear();
+            result.Clear();
+            count = 0;
+            mainEquation = "";
+
             decomposition(equation);
             return result;
         }
@@ -64,36 +67,37 @@ namespace SolutionSystemEquationMultioperations.helpers
             return "";
         }
 
-        public void getEquationPresent(Dictionary<string, Multioperation> multioperations, string key)
+        public void getEquationPresent(int rang, Dictionary<string, Multioperation> multioperations, string key)
         {
             string[] arguments = multioperations[key].arguments;
             string[][] newEquationPresent = new string[multioperations[key].codeRepresentation.Length][];
             foreach (string argument in arguments)
             {
-                if (newEquationPresent[0] == null) newEquationPresent = matrixMultiplication(multioperations[argument].equationPresent, multioperations[key].codeRepresentation);
-                else newEquationPresent = matrixMultiplication(multioperations[argument].equationPresent, null, newEquationPresent);
+                if (newEquationPresent[0] == null) newEquationPresent = matrixMultiplication(rang, multioperations[argument].equationPresent, multioperations[key].codeRepresentation);
+                else newEquationPresent = matrixMultiplication(rang, multioperations[argument].equationPresent, null, newEquationPresent);
             }
             multioperations[key].equationPresent = newEquationPresent;
         }
 
-        private string[][] matrixMultiplication(string[][] equationPresent, int[][] codeRepresentation = null, string[][] newEquationPresent = null)
+        private string[][] matrixMultiplication(int rang, string[][] equationPresent, int[][] codeRepresentation = null, string[][] newEquationPresent = null)
         {
-            string[][] result = new string[2][];
-            //Работает только для ранга 2
+            string[][] result = new string[rang][];
             if (codeRepresentation != null)
             {
                 for (int i = 0; i < codeRepresentation.Length; i++)
                 {
-                    string[] partEquation = new string[codeRepresentation[0].Length / 2];
+                    string[] partEquation = new string[codeRepresentation[0].Length / rang];
                     int countPartEquation = 0;
-                    for (int j = 0; j < codeRepresentation[i].Length; j+=2)
+                    for (int j = 0; j < codeRepresentation[i].Length; j+=rang)
                     {
                         string s = "";
-                        if (codeRepresentation[i][j] == 1) s += equationPresent[0][0];
-                        if (codeRepresentation[i][j + 1] == 1)
+                        for (int k = 0; k < rang; k++)
                         {
-                            if (s != "") s += "V" + equationPresent[1][0];
-                            else s += equationPresent[1][0];
+                            if (codeRepresentation[i][j + k] == 1)
+                            {
+                                if (s == "") s += equationPresent[k][0];
+                                else s += "V" + equationPresent[k][0];
+                            }
                         }
                         if (s == "") s = "0";
                         partEquation[countPartEquation] = s;
@@ -107,31 +111,24 @@ namespace SolutionSystemEquationMultioperations.helpers
             {
                 for (int i = 0; i < newEquationPresent.Length; i++)
                 {
-                    string[] partEquation = new string[newEquationPresent[0].Length / 2];
+                    string[] partEquation = new string[newEquationPresent[0].Length / rang];
                     int countPartEquation = 0;
-                    for (int j = 0; j < newEquationPresent[i].Length; j+=2)
+                    for (int j = 0; j < newEquationPresent[i].Length; j+=rang)
                     {
                         string s = "";
-                        if (newEquationPresent[i][j] != "0")
+                        for (int k = 0; k < rang; k++)
                         {
-                            if (newEquationPresent[i][j].Contains('V'))
+                            if (newEquationPresent[i][j + k] != "0")
                             {
-                                string[] split = newEquationPresent[i][j].Split('V');
-                                foreach (string temp in split) s += temp + equationPresent[0][0] + "V";
-                                if (s[s.Length - 1] == 'V') s = s.Remove(s.Length - 1, 1);
+                                if (s != "") s += "V";
+                                if (newEquationPresent[i][j + k].Contains('V'))
+                                {
+                                    string[] split = newEquationPresent[i][j + k].Split('V');
+                                    foreach (string temp in split) s += temp + equationPresent[k][0] + "V";
+                                    if (s[s.Length - 1] == 'V') s = s.Remove(s.Length - 1, 1);
+                                }
+                                else s += newEquationPresent[i][j + k] + equationPresent[k][0];
                             }
-                            else s += newEquationPresent[i][j] + equationPresent[0][0];
-                        }
-                        if (newEquationPresent[i][j + 1] != "0")
-                        {
-                            if (s != "") s += "V";
-                            if (newEquationPresent[i][j + 1].Contains('V'))
-                            {
-                                string[] split = newEquationPresent[i][j + 1].Split('V');
-                                foreach (string temp in split) s += temp + equationPresent[1][0] + "V";
-                                if (s[s.Length - 1] == 'V') s = s.Remove(s.Length - 1, 1);
-                            }
-                            else s += newEquationPresent[i][j + 1] + equationPresent[1][0];
                         }
                         if (s == "") s = "0";
                         partEquation[countPartEquation] = s;
@@ -141,7 +138,6 @@ namespace SolutionSystemEquationMultioperations.helpers
                     result[i] = partEquation;
                 }
             }
-            //Работает только для ранга 2
             return result;
         }
 

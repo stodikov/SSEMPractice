@@ -37,7 +37,7 @@ namespace SolutionSystemEquationMultioperations.helpers
             }
             else
             {
-                if (arguments.Length > 1) binarySize = (int)Math.Pow(arguments.Length, 2);
+                if (arguments.Length > 1) binarySize = (int)Math.Pow(2, arguments.Length);
                 for (int i = 0; i < binarySize; i++)
                 {
                     binary = Convert.ToString(i, 2);
@@ -136,12 +136,10 @@ namespace SolutionSystemEquationMultioperations.helpers
                         else resultTemp += $"V{conjuction_temp}";
                     }
                 }
-                if (resultTemp != "")
-                {
-                    if (resultDerivative == "") resultDerivative += $"({resultTemp})";
-                    else resultDerivative += $"*({resultTemp})";
-                    resultTemp = "";
-                }
+                if (resultTemp == "") return "";
+                if (resultDerivative == "") resultDerivative += $"({resultTemp})";
+                else resultDerivative += $"*({resultTemp})";
+                resultTemp = "";
             }
             return resultDerivative;
         }
@@ -270,6 +268,7 @@ namespace SolutionSystemEquationMultioperations.helpers
         public string pseudoDeMorgan(string input)
         {
             if (input == "1") return "";
+            if (input == "0") return "1";
             string result = "";
             string[] split = input.Split('V');
             string[][] splitInput = new string[split.Length][];
@@ -293,7 +292,7 @@ namespace SolutionSystemEquationMultioperations.helpers
         public string checkConditions(string input, bool neg, string[] conditionsSolvavility)
         {
             if (conditionsSolvavility == null) return input;
-            string[] split = TMT.deleteRepeatElements(new string[] { input });
+            string[] split = TMT.deleteRepeatElementsAM(new string[] { input });
             split = split[0].Split('V');
             string result = "";
             bool negCon = false;
@@ -375,7 +374,7 @@ namespace SolutionSystemEquationMultioperations.helpers
 
             if (input != "")
             {
-                split = TMT.deleteRepeatElements(new string[] { input.TrimEnd('V') });
+                split = TMT.deleteRepeatElementsAM(new string[] { input.TrimEnd('V') });
                 input = split[0];
             }
             return input;

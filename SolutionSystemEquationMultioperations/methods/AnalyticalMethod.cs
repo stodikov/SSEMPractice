@@ -21,31 +21,27 @@ namespace SolutionSystemEquationMultioperations.methods
         string fullEquation;
         char[] indexs = { 'S', 'T', 'D' };
         int countIndexs;
-        string allIndexs = "";
-        string conditionIndex = "";
+        string allIndexs;
+        string conditionIndex;
 
         public Dictionary<string, string[][]> getSolution(string[][] equation, string constants, string unknows, string[] conditionsInput = null)
         {
-            if (solvabilityTest(equation, unknows, conditionsInput))
-            {
-                getFormulasUnknows(unknows);
-                prepareArbitraryBF(constants);
-                if (conditionsSolvavility == null) getResultWithoutConditions();
-                else getResultWithConditions();
-                //Придумать как хранить А и В
-                /*
-                 * 2 Варианта
-                 * Первый: Условий разрешимости нет:
-                 * В систему х и у записываем развернутые А и В, и делаем цикл на все возможные варианты развернутых А и В
-                 * Если новый ответ есть среди наших ответов - пропускаем, иначе записываем
-                 * 
-                 * Второй: Условия разрешимости есть:
-                 * Составляем все возможные условия разрешимости
-                 * Минимизируем развернутые А и В путем взятия остаточных по условиям разрешимости
-                 * В систему х и у записываем развернутые А и В, и делаем цикл на все возможные варианты развернутых А и В
-                 * Если новый ответ есть среди наших ответов - пропускаем, иначе записываем
-                */
-            }
+            formulsUnknows.Clear();
+            disclosedFormulsUnknows.Clear();
+            formulsArbitraryBF.Clear();
+            formulsArbitraryBFWithConditions.Clear();
+            resultsPairs.Clear();
+            conditionsSolvavility = null;
+            countIndexs = 0;
+            allIndexs = "";
+            conditionIndex = "";
+
+            if (!solvabilityTest(equation, unknows, conditionsInput)) return null;
+
+            getFormulasUnknows(unknows);
+            prepareArbitraryBF(constants);
+            if (conditionsSolvavility == null) getResultWithoutConditions();
+            else getResultWithConditions();
 
             return resultsPairs;
         }
@@ -56,15 +52,16 @@ namespace SolutionSystemEquationMultioperations.methods
             string resultDerivative = "";
             fullEquation = "";
 
-            //Ошибка в общей формуле (fullEquation)
-
             for (int i = 0; i < equation.Length; i++) equationTemp[i] = equation[i][0]; //костыль!
             for (int i = 0; i < equationTemp.Length; i++)
             {
                 string[] splitEquation = equationTemp[i].Split('<');
                 string leftPartEquation = $"({translateFormul(splitEquation[0])})";
                 string rightPartEquation = $"({gf.getMultiConjuction(gf.pseudoDeMorgan(translateFormul(splitEquation[1])))})";
-                fullEquation += gf.getMultiConjuction($"{leftPartEquation}*{rightPartEquation}") + 'V';
+
+                if (rightPartEquation == "()") continue;
+                if (rightPartEquation == "(1)") fullEquation += leftPartEquation.Trim(new char[] { '(', ')' }) + 'V';
+                else fullEquation += gf.getMultiConjuction($"{leftPartEquation}*{rightPartEquation}") + 'V';
             }
             fullEquation = fullEquation.TrimEnd('V');
             //тест
@@ -109,8 +106,7 @@ namespace SolutionSystemEquationMultioperations.methods
             res = res.TrimEnd('&');
             return res;
         }
-
-        //Внимательно изучить функцию
+        
         private void getFormulasUnknows(string unknows)
         {
             unknows = new string(unknows.ToCharArray().Reverse().ToArray());
@@ -122,10 +118,10 @@ namespace SolutionSystemEquationMultioperations.methods
                 unknowsTemp = unknowsTemp.Replace(Convert.ToString(unknows[i]), "");
                 if (unknowsTemp.Length > 0) m = gf.getMultiConjuction(gf.getDerivativesGivesUnknows(equation_temp, unknowsTemp));
                 else m = equation_temp;
-                //Подумать над реализацией условий разрешимости
+
                 derivative0 = gf.checkConditions(gf.getDerivative(m, Convert.ToString(unknows[i]), 0), false, conditionsSolvavility);
                 derivative1 = gf.checkConditions(gf.getDerivative(m, Convert.ToString(unknows[i]), 1), true, conditionsSolvavility);
-                //Подумать над реализацией условий разрешимости
+
                 if (derivative0 != "" && derivative1 != "") formulsUnknows.Add(Convert.ToString(unknows[i]), gf.getMultiConjuction($"A{i}*{derivative0}") + "V" + gf.getMultiConjuction($"(-A{i})*{gf.pseudoDeMorgan(derivative1)}"));
                 if (derivative0 == "" && derivative1 != "") formulsUnknows.Add(Convert.ToString(unknows[i]), gf.getMultiConjuction($"(-A{i})*{gf.pseudoDeMorgan(derivative1)})"));
                 if (derivative0 != "" && derivative1 == "") formulsUnknows.Add(Convert.ToString(unknows[i]), gf.getMultiConjuction($"A{i}*{derivative0}"));
@@ -140,7 +136,7 @@ namespace SolutionSystemEquationMultioperations.methods
         private void prepareArbitraryBF(string constants)
         {
             int binarySize = 2;
-            if (constants.Length > 1) binarySize = (int)Math.Pow(constants.Length, 2);
+            if (constants.Length > 1) binarySize = (int)Math.Pow(2, constants.Length);
             string tempFormula = "";
 
             for (int i = 0; i < binarySize; i++)
@@ -187,16 +183,9 @@ namespace SolutionSystemEquationMultioperations.methods
             string[] splitV = conditionsSolvavility[0].Split('V');
             string[][] splitCon = new string[splitV.Length][];
             Dictionary<string, Dictionary<string, int>> conditions = new Dictionary<string, Dictionary<string, int>>();
+
             for (int i = 0; i < splitV.Length; i++) splitCon[i] = splitV[i].Split('&');
-
-            if (splitCon.Length == 1)
-            {
-                //conditions = new string[splitCon[0].Length];
-                //for (int i = 0; i < splitCon[0].Length; i++) conditions[i] = splitCon[0][i];
-                conditions = gf.getConditions(splitCon, conditionsSolvavility[0]);
-            }
-            else conditions = gf.getConditions(splitCon, conditionsSolvavility[0]);
-
+            conditions = gf.getConditions(splitCon, conditionsSolvavility[0]);
             foreach (KeyValuePair<string, Dictionary<string, int>> condition in conditions)
             {
                 string unnecessaryIndexs = allIndexs;
@@ -206,8 +195,6 @@ namespace SolutionSystemEquationMultioperations.methods
                 foreach (KeyValuePair<string, string> kvp in formulsArbitraryBF.ToArray())
                 {
                     string formula = kvp.Value;
-
-                    //foreach (char c in condition) formula = gf.getDerivative(formula, Convert.ToString(c), 0);
                     foreach (KeyValuePair<string, int> arguments in condition.Value) formula = gf.getDerivative(formula, arguments.Key, arguments.Value); 
 
                     if (!formulsArbitraryBFWithConditions.ContainsKey(kvp.Key))
@@ -218,8 +205,6 @@ namespace SolutionSystemEquationMultioperations.methods
                 foreach (KeyValuePair<string, string> kvp in formulsUnknows.ToArray())
                 {
                     string formula = kvp.Value;
-
-                    //foreach (char c in condition) formula = gf.getDerivative(formula, Convert.ToString(c), 0);
                     foreach (KeyValuePair<string, int> arguments in condition.Value) formula = gf.getDerivative(formula, arguments.Key, arguments.Value);
 
                     formula = gf.substitution(formula, formulsArbitraryBFWithConditions);
@@ -227,21 +212,10 @@ namespace SolutionSystemEquationMultioperations.methods
                     if (!disclosedFormulsUnknows.ContainsKey(kvp.Key))
                         disclosedFormulsUnknows.Add(kvp.Key, formula);
                     else disclosedFormulsUnknows[kvp.Key] = formula;
-
-                    //foreach (string index in splitIndexs)
-                    //{
-                    //    if (formula.Contains(index)) unnecessaryIndexs = unnecessaryIndexs.Replace(index + "&", "");
-                    //    if (formula.Contains(index)) unnecessaryIndexs = unnecessaryIndexs.Replace("&" + index, ""); //костыль
-                    //}
                     foreach (string index in splitIndexs) if (formula.Contains(index)) unnecessaryIndexs = deleteIndex(unnecessaryIndexs, index);
                 }
 
                 splitIndexs = unnecessaryIndexs.Split('&');
-                //foreach (string index in splitIndexs)
-                //{
-                //    if (conditionIndex.Contains(index)) conditionIndex = conditionIndex.Replace(index + '&', "");
-                //    if (conditionIndex.Contains(index)) conditionIndex = conditionIndex.Replace(index, ""); //костыль
-                //}
                 foreach (string index in splitIndexs) if (conditionIndex.Contains(index)) conditionIndex = deleteIndex(conditionIndex, index);
                 conditionIndex = conditionIndex.TrimStart('&').TrimEnd('&');
                 getResult(condition.Key);
@@ -257,8 +231,7 @@ namespace SolutionSystemEquationMultioperations.methods
             }
             return res.TrimEnd('&');
         }
-
-        //Проверить работу функции
+        
         private void getResultWithoutConditions()
         {
             conditionIndex = allIndexs;
@@ -272,21 +245,7 @@ namespace SolutionSystemEquationMultioperations.methods
                 else disclosedFormulsUnknows[kvp.Key] = formula;
             }
             getResult();
-
-            /*
-                * 2 Варианта
-                * Первый: Условий разрешимости нет:
-                * В систему х и у записываем развернутые А и В, и делаем цикл на все возможные варианты развернутых А и В
-                * Если новый ответ есть среди наших ответов - пропускаем, иначе записываем
-                * 
-                * Второй: Условия разрешимости есть:
-                * Составляем все возможные условия разрешимости
-                * Минимизируем развернутые А и В путем взятия остаточных по условиям разрешимости
-                * В систему х и у записываем развернутые А и В, и делаем цикл на все возможные варианты развернутых А и В
-                * Если новый ответ есть среди наших ответов - пропускаем, иначе записываем
-            */
         }
-        //Проверить работу функции
 
         private void getResult(string condition = "")
         {
@@ -347,16 +306,15 @@ namespace SolutionSystemEquationMultioperations.methods
                         else tempglobal_res += $"{templocal_res.Replace("1", "")}V";
                     }
 
-                    if (tempglobal_res == "") res = "0|" + res; /*res = $"{kvp.Key}=0|" + res;*/
+                    if (tempglobal_res == "") res = "0|" + res;
                     else
                     {
                         tempglobal_res = TMT.deleteRepeatElementsAM(new string[] { tempglobal_res })[0].TrimEnd('V');
-                        res = $"{tempglobal_res}|" + res; /*res = $"{kvp.Key}={tempglobal_res}|" + res;*/
+                        res = $"{tempglobal_res}|" + res;
                     }
                 }
                 res = $"[{res.TrimEnd('|')}]";
-
-                //Сделать нормальный вывод!
+                
                 if (!globalRes.Contains(res)) globalRes += $"{res}/";
             }
 
