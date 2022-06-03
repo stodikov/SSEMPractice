@@ -10,13 +10,44 @@ namespace SolutionSystemEquationMultioperations.helpers
         public int[][] parseMOtoVectors(int[] MO, int rang)
         {
             int n = MO.Length;
+            int[][] codeForInt = getCodeForInt(rang);
+            int[][] codeRepresentation = new int[rang][];
+
+            for (int r = 0; r < rang; r++)
+            {
+                int[] newElementRang = new int[n];
+                for (int k = 0; k < n; k++)
+                {
+                    newElementRang[k] = codeForInt[MO[k]][r];
+                }
+                codeRepresentation[r] = newElementRang;
+            }
+
+            return codeRepresentation;
+        }
+
+        public string[][] parseMOtoVectorsEquation(int[] MO, int rang)
+        {
+            int n = MO.Length;
+            int[][] codeForInt = getCodeForInt(rang);
+            string[][] codeRepresentation = new string[rang][];
+
+            for (int r = 0; r < rang; r++)
+            {
+                string[] newElementRang = new string[n];
+                for (int k = 0; k < n; k++)
+                {
+                    newElementRang[k] = Convert.ToString(codeForInt[MO[k]][r]);
+                }
+                codeRepresentation[r] = newElementRang;
+            }
+
+            return codeRepresentation;
+        }
+
+        public int[][] getCodeForInt(int rang)
+        {
             int logicElements = (int)Math.Pow(2, rang);
-            //int[][] codeForInt = new int[][] {
-            //    new int[] { 0, 0 },
-            //    new int[] { 1, 0 },
-            //    new int[] { 0, 1 },
-            //    new int[] { 1, 1 }
-            //};
             int[][] codeForInt = new int[logicElements][];
             string binary = "", temp = "";
             for (int i = 0; i < logicElements; i++)
@@ -33,28 +64,7 @@ namespace SolutionSystemEquationMultioperations.helpers
                 for (int j = 0; j < codeElement.Length; j++) codeElement[j] = binary[j] - '0';
                 codeForInt[i] = codeElement;
             }
-            
-            int[][] codeRepresentation = new int[rang][];
-            //int[] newElementOne = new int[n],
-            //      newElementTwo = new int[n];
-
-            //for (int k = 0; k < n; k++)
-            //{
-            //    newElementOne[k] = codeForInt[MO[k]][0];
-            //    newElementTwo[k] = codeForInt[MO[k]][1];
-            //}
-
-            for (int r = 0; r < rang; r++)
-            {
-                int[] newElementRang = new int[n];
-                for (int k = 0; k < n; k++)
-                {
-                    newElementRang[k] = codeForInt[MO[k]][r];
-                }
-                codeRepresentation[r] = newElementRang;
-            }
-
-            return codeRepresentation;
+            return codeForInt;
         }
     }
 }

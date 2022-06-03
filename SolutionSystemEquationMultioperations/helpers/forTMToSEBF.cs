@@ -13,18 +13,19 @@ namespace SolutionSystemEquationMultioperations.helpers
         int count = 0;
         string mainEquation = "";
 
-        public ArrayList decompositionEquation(string equation)
+        public ArrayList decompositionEquation(string equation, int indexEquation)
         {
             designations.Clear();
             result.Clear();
             count = 0;
             mainEquation = "";
 
-            decomposition(equation);
+            decomposition(equation, indexEquation);
+
             return result;
         }
 
-        public string decomposition(string equation)
+        public string decomposition(string equation, int indexEquation)
         {
             string function = "", functionArguments = "", arguments = "", codeFunction = "";
             while (count < equation.Length)
@@ -33,16 +34,16 @@ namespace SolutionSystemEquationMultioperations.helpers
                 {
                     case '(':
                         count++;
-                        arguments = decomposition(equation);
+                        arguments = decomposition(equation, indexEquation);
                         if (designations.ContainsKey(function))
                         {
-                            codeFunction = $"{function}_{Convert.ToString(designations[function])}";
+                            codeFunction = $"{function}_{Convert.ToString(designations[function])}_{indexEquation}";
                             designations[function] = designations[function] + 1;
                         }
                         else
                         {
                             designations.Add(function, 1);
-                            codeFunction = $"{function}_0";
+                            codeFunction = $"{function}_0_{indexEquation}";
                         }
                         result.Add($"{codeFunction}={function}|{arguments}");
                         functionArguments = functionArguments.Substring(0, functionArguments.LastIndexOf(function)) + codeFunction;
@@ -53,16 +54,19 @@ namespace SolutionSystemEquationMultioperations.helpers
                     case '<':
                         function = "";
                         functionArguments = "";
-                        mainEquation = result[result.Count - 1].ToString().Split('=')[0] + '<';
+                        if (result.Count != 0) mainEquation = result[result.Count - 1].ToString().Split('=')[0] + '<';
+                        else mainEquation = equation.Substring(0, count) + '<';
                         break;
                     default:
                         if (equation[count] != ',') function += equation[count];
+                        else function = "";
                         functionArguments += equation[count];
                         break;
                 }
                 count++;
             }
-            mainEquation += result[result.Count - 1].ToString().Split('=')[0];
+            if (function != "") mainEquation += function;
+            else mainEquation += result[result.Count - 1].ToString().Split('=')[0];
             result.Add(mainEquation);
             return "";
         }
@@ -71,6 +75,8 @@ namespace SolutionSystemEquationMultioperations.helpers
         {
             string[] arguments = multioperations[key].arguments;
             string[][] newEquationPresent = new string[multioperations[key].codeRepresentation.Length][];
+
+            Array.Reverse(arguments);
             foreach (string argument in arguments)
             {
                 if (newEquationPresent[0] == null) newEquationPresent = matrixMultiplication(rang, multioperations[argument].equationPresent, multioperations[key].codeRepresentation);
@@ -88,6 +94,7 @@ namespace SolutionSystemEquationMultioperations.helpers
                 {
                     string[] partEquation = new string[codeRepresentation[0].Length / rang];
                     int countPartEquation = 0;
+                    int countEquationPresent = 0;
                     for (int j = 0; j < codeRepresentation[i].Length; j+=rang)
                     {
                         string s = "";
@@ -95,13 +102,25 @@ namespace SolutionSystemEquationMultioperations.helpers
                         {
                             if (codeRepresentation[i][j + k] == 1)
                             {
-                                if (s == "") s += equationPresent[k][0];
-                                else s += "V" + equationPresent[k][0];
+                                if (equationPresent[k][countEquationPresent] == "1")
+                                {
+                                    s = "1";
+                                    break;
+                                } else if (equationPresent[k][countEquationPresent] == "0")
+                                {
+                                    if (s == "") s += "0";
+                                }
+                                else
+                                {
+                                    if (s == "") s += equationPresent[k][countEquationPresent];
+                                    else s += "V" + equationPresent[k][countEquationPresent];
+                                }
                             }
                         }
                         if (s == "") s = "0";
                         partEquation[countPartEquation] = s;
                         countPartEquation++;
+                        countEquationPresent = (countEquationPresent + 1) % equationPresent[0].Length;
                     }
                     partEquation = deleteRepeatElements(partEquation);
                     result[i] = partEquation;
@@ -118,27 +137,149 @@ namespace SolutionSystemEquationMultioperations.helpers
                         string s = "";
                         for (int k = 0; k < rang; k++)
                         {
-                            if (newEquationPresent[i][j + k] != "0")
+                            if (newEquationPresent[i][j + k] == "0") continue;
+                            if (newEquationPresent[i][j + k] == "1")
                             {
-                                if (s != "") s += "V";
-                                if (newEquationPresent[i][j + k].Contains('V'))
-                                {
-                                    string[] split = newEquationPresent[i][j + k].Split('V');
-                                    foreach (string temp in split) s += temp + equationPresent[k][0] + "V";
-                                    if (s[s.Length - 1] == 'V') s = s.Remove(s.Length - 1, 1);
-                                }
-                                else s += newEquationPresent[i][j + k] + equationPresent[k][0];
+                                s += equationPresent[k][0] + "V";
+                                continue;
+                            }
+
+                            if (equationPresent[k][0] == "0") continue;
+                            if (equationPresent[k][0] == "1")
+                            {
+                                s += newEquationPresent[i][j + k] + "V";
+                                continue;
+                            }
+                            
+                            if (newEquationPresent[i][j + k].Contains('V') && !equationPresent[k][0].Contains('V'))
+                            {
+                                string[] split = newEquationPresent[i][j + k].Split('V');
+                                foreach(string temp in split) s += temp + equationPresent[k][0] + "V";
+                            }
+                            else if (!newEquationPresent[i][j + k].Contains('V') && equationPresent[k][0].Contains('V'))
+                            {
+                                string[] split = equationPresent[k][0].Split('V');
+                                foreach (string temp in split) s += temp + newEquationPresent[i][j + k] + "V";
+                            }
+                            else
+                            {
+                                string[] splitNewEquation = newEquationPresent[i][j + k].Split('V');
+                                string[] splitEquation = equationPresent[k][0].Split('V');
+                                foreach (string elemNewEquation in splitNewEquation)
+                                    foreach (string elemEquation in splitEquation)
+                                        s += elemNewEquation + elemEquation + "V";
                             }
                         }
+                        s = s.TrimEnd('V');
                         if (s == "") s = "0";
+                        s = reductionEquation(s);
                         partEquation[countPartEquation] = s;
                         countPartEquation++;
                     }
-                    partEquation = deleteRepeatElements(partEquation);
+                    for (int j = 0; j < partEquation.Length; j++) partEquation[j] = reductionEquationAM(partEquation[j]);
                     result[i] = partEquation;
                 }
             }
             return result;
+        }
+
+        public string reductionEquation(string equation)
+        {
+            equation = deleteRepeatElements(new string[] { equation })[0];
+            string[] splitEquation = equation.Split('V');
+            string indexsMin = "";
+            int min = Int32.MaxValue, indexMin = 0, max = Int32.MinValue;
+
+            while (min != max)
+            {
+                min = Int32.MaxValue;
+                max = Int32.MinValue;
+                for (int i = 0; i < splitEquation.Length; i++)
+                {
+                    if (splitEquation[i] != "" && splitEquation[i].Length <= min && !indexsMin.Contains($"[{i}]"))
+                    {
+                        min = splitEquation[i].Length;
+                        indexMin = i;
+                    }
+                    if (splitEquation[i] != "" && splitEquation[i].Length > max) max = splitEquation[i].Length;
+                }
+
+                string minElem = splitEquation[indexMin];
+                indexsMin += $"[{indexMin}]";
+                for (int i = 0; i < splitEquation.Length; i++)
+                {
+                    bool swapOnMin = false;
+                    if (i != indexMin)
+                    {
+                        foreach (char elem in minElem)
+                        {
+                            if (splitEquation[i].Contains(elem)) swapOnMin = true;
+                            else
+                            {
+                                swapOnMin = false;
+                                break;
+                            }
+                        }
+                        if (swapOnMin) splitEquation[i] = minElem;
+                    }
+                }
+            }
+
+            return deleteRepeatElements(new string[] { String.Join("V", splitEquation) })[0];
+        }
+
+        public string reductionEquationAM(string equation)
+        {
+            if (equation == "") return equation;
+            equation = deleteRepeatElementsAM(new string[] { equation })[0];
+            string[] splitEquation = equation.Split('V');
+            string indexsMin = "";
+            int min = Int32.MaxValue, indexMin = 0, max = Int32.MinValue;
+
+            while (min != max)
+            {
+                min = Int32.MaxValue;
+                max = Int32.MinValue;
+                for (int i = 0; i < splitEquation.Length; i++)
+                {
+                    if (splitEquation[i] != "" && splitEquation[i].Length <= min && !indexsMin.Contains($"[{i}]"))
+                    {
+                        min = splitEquation[i].Length;
+                        indexMin = i;
+                    }
+                    if (splitEquation[i] != "" && splitEquation[i].Length > max) max = splitEquation[i].Length;
+                }
+
+                string minElem = splitEquation[indexMin];
+                indexsMin += $"[{indexMin}]";
+                for (int i = 0; i < splitEquation.Length; i++)
+                {
+                    if (i != indexMin)
+                    {
+                        string[] splitMinElem = minElem.Split('&');
+                        string[] splitEquationOnConjunction = splitEquation[i].Split('&');
+                        int count = 0;
+
+                        foreach (string tempMin in splitMinElem)
+                        {
+                            foreach (string tempEq in splitEquationOnConjunction)
+                            {
+                                if (tempMin == tempEq)
+                                {
+                                    count++;
+                                    break;
+                                }
+                            }
+                        }
+                        if (count == splitMinElem.Length)
+                        {
+                            splitEquation[i] = minElem;
+                        }
+                    }
+                }
+            }
+
+            return deleteRepeatElementsAM(new string[] { String.Join("V", splitEquation) })[0];
         }
 
         public string[] deleteRepeatElements(string[] input)

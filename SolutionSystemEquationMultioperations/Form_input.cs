@@ -31,22 +31,20 @@ namespace SolutionSystemEquationMultioperations
         private void button_getResualtEquation_Click(object sender, EventArgs e)
         {
             char[] forTrim = new char[] { '\r', '\n', ' ' };
-            string equationInput = textBox_Equation.Text.Trim(forTrim);
+            string[] equationsInput = textBox_Equation.Text.Trim(forTrim).Replace("\r", "").Split('\n');
             string[] multioperationsInput = textBox_Multioperations.Text.Trim(forTrim).Replace("\r", "").Split('\n');
-            string[] constantsInput = textBox_constants.Text.Trim(forTrim).Replace("\r", "").Split('\n');
-            string[] unknowsInput = textBox_unknows.Text.Trim(forTrim).Replace("\r", "").Split('\n');
+            string[] coefficientsInput = textBox_coefficients.Text.Trim(forTrim).Replace("\r", "").Split('\n');
+            string[] unknownsInput = textBox_unknows.Text.Trim(forTrim).Replace("\r", "").Split('\n');
             string[] conditionsInput = textBox_conditions.Text.Trim(forTrim).Replace("\r", "").Split('\n');
             int rang = Convert.ToInt32(textBox_Rang.Text);
             string[] splitInput;
-            string equation = "", constants = "", unknows = "",
+            string[] temp;
+            string[] equations;
+            string coefficients = "", unknowns = "", notConstants = "",
                 method = radioButton_AM.Checked ? "analytical" : "numeric",
                 formatAnswer = radioButton_FormatHorizontal.Checked ? "horizontal" : "vertical";
             Dictionary<string, Multioperation> multioperations = new Dictionary<string, Multioperation>();
             Dictionary<string, int[]> designationAndVector = new Dictionary<string, int[]>();
-
-            ArrayList list = TMT.decompositionEquation(equationInput);
-            splitInput = new string[list.Count];
-            for (int i = 0; i < splitInput.Length; i++) splitInput[i] = list[i].ToString();
 
             foreach (string s in multioperationsInput)
             {
@@ -67,25 +65,60 @@ namespace SolutionSystemEquationMultioperations
                 }
             }
 
-            foreach (string s in splitInput)
+            equations = new string[equationsInput.Length];
+            for (int i = 0; i < equationsInput.Length; i++)
             {
-                if (s.Contains('<')) equation = s;
-                else
-                {
-                    string designation = s.Split('=')[0];
-                    string designationMultioperation = s.Split('=')[1].Split('|')[0];
-                    string[] arguments = s.Split('=')[1].Split('|')[1].Split(',');
+                ArrayList list = TMT.decompositionEquation(equationsInput[i], i);
+                splitInput = new string[list.Count];
+                for (int j = 0; j < splitInput.Length; j++) splitInput[j] = list[j].ToString();
 
-                    if (designationAndVector.ContainsKey(designationMultioperation))
+                foreach (string s in splitInput)
+                {
+                    if (s.Contains('<')) equations[i] = s;
+                    else
                     {
-                        int[][] codeRepresentation = helpers.parseMOtoVectors(designationAndVector[designationMultioperation], rang);
-                        Multioperation newMO = new Multioperation(designationMultioperation, codeRepresentation, arguments, null);
-                        multioperations.Add(designation, newMO);
+                        string designation = s.Split('=')[0];
+                        string designationMultioperation = s.Split('=')[1].Split('|')[0];
+                        string[] arguments = s.Split('=')[1].Split('|')[1].Split(',');
+
+                        if (designationAndVector.ContainsKey(designationMultioperation))
+                        {
+                            notConstants += designationMultioperation + ',';
+                            int[][] codeRepresentation = helpers.parseMOtoVectors(designationAndVector[designationMultioperation], rang);
+                            Multioperation newMO = new Multioperation(designationMultioperation, codeRepresentation, arguments, null);
+                            multioperations.Add(designation, newMO);
+                        }
                     }
                 }
             }
+
+            temp = notConstants.TrimEnd(',').Split(',').Distinct().ToArray();
+            foreach (KeyValuePair<string, int[]> kvp in designationAndVector)
+            {
+                if (temp.Contains(kvp.Key)) continue;
+                string[][] equationPresent = helpers.parseMOtoVectorsEquation(designationAndVector[kvp.Key], rang);
+                Multioperation newMO = new Multioperation(kvp.Key, null, null, equationPresent);
+                multioperations.Add(kvp.Key, newMO);
+
+            }
             
-            foreach (string s in constantsInput)
+            if (coefficientsInput[0] != "")
+            {
+                foreach (string s in coefficientsInput)
+                {
+                    string designation = s.Split('|')[0];
+                    string[] elements = s.Split('|')[1].Split(',');
+                    string[][] newEquation = new string[elements.Length][];
+                    for (int i = 0; i < elements.Length; i++)
+                    {
+                        newEquation[i] = new string[] { elements[i] };
+                        coefficients += elements[i];
+                    }
+                    multioperations.Add(designation, new Multioperation(designation, null, null, newEquation));
+                }
+            }
+
+            foreach (string s in unknownsInput)
             {
                 string designation = s.Split('|')[0];
                 string[] elements = s.Split('|')[1].Split(',');
@@ -93,25 +126,12 @@ namespace SolutionSystemEquationMultioperations
                 for (int i = 0; i < elements.Length; i++)
                 {
                     newEquation[i] = new string[] { elements[i] };
-                    constants += elements[i];
+                    unknowns += elements[i];
                 }
                 multioperations.Add(designation, new Multioperation(designation, null, null, newEquation));
             }
 
-            foreach (string s in unknowsInput)
-            {
-                string designation = s.Split('|')[0];
-                string[] elements = s.Split('|')[1].Split(',');
-                string[][] newEquation = new string[elements.Length][];
-                for (int i = 0; i < elements.Length; i++)
-                {
-                    newEquation[i] = new string[] { elements[i] };
-                    unknows += elements[i];
-                }
-                multioperations.Add(designation, new Multioperation(designation, null, null, newEquation));
-            }
-
-            Dictionary<string, string[][]> resultEquation = controller.start(rang, multioperations, conditionsInput, equation, constants, unknows, method);
+            Dictionary<string, string[][]> resultEquation = controller.start(rang, multioperations, conditionsInput, equations, coefficients, unknowns, method);
 
             textBox_resualEquation.Text = "";
             foreach (KeyValuePair<string, string[][]> kvpRes in resultEquation)
@@ -130,9 +150,9 @@ namespace SolutionSystemEquationMultioperations
                 answer = answer.TrimEnd(new char[] { ' ', ',' }) + "\r\n";
                 if (formatAnswer == "horizontal")
                 {
-                    for (int i = 0; i < unknows.Length; i++)
+                    for (int i = 0; i < unknowns.Length; i++)
                     {
-                        for (int j = 0; j < resValue.Length; j++) answer += unknows[i] + " = " + resValue[j][i] + "   ";
+                        for (int j = 0; j < resValue.Length; j++) answer += unknowns[i] + " = " + resValue[j][i] + "   ";
                         answer += "\r\n";
                     }
                     answer += "\r\n";
@@ -141,7 +161,7 @@ namespace SolutionSystemEquationMultioperations
                 {
                     for (int i = 0; i < resValue.Length; i++)
                     {
-                        for (int j = 0; j < unknows.Length; j++) answer += unknows[j] + " = " + resValue[i][j] + "\r\n";
+                        for (int j = 0; j < unknowns.Length; j++) answer += unknowns[j] + " = " + resValue[i][j] + "\r\n";
                         answer += "\r\n";
                     }
                 }

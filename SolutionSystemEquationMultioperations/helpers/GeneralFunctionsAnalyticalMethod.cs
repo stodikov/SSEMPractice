@@ -83,7 +83,7 @@ namespace SolutionSystemEquationMultioperations.helpers
             string binary = "", temp = "", resultDerivative = "", resultTemp = "";
             string[] splitEquation;
             int binarySize = 2;
-            if (unknows.Length > 1) binarySize = (int)Math.Pow(unknows.Length, 2);
+            if (unknows.Length > 1) binarySize = (int)Math.Pow(2, unknows.Length);
             for (int i = 0; i < binarySize; i++)
             {
                 binary = Convert.ToString(i, 2);
@@ -177,22 +177,27 @@ namespace SolutionSystemEquationMultioperations.helpers
 
                     conjuction_temp = res_replace.TrimStart('&').TrimEnd('&');
 
-                    if (resultDerivative == "") resultDerivative += conjuction_temp;
-                    else resultDerivative += $"V{conjuction_temp}";
+                    if (conjuction_temp != "")
+                    {
+                        if (resultDerivative == "") resultDerivative += conjuction_temp;
+                        else resultDerivative += $"V{conjuction_temp}";
+                    }
                 }
             }
             resultDerivative = resultDerivative.TrimStart('(').TrimEnd(')');
+            if (resultDerivative == "") resultDerivative = "0";
             return resultDerivative;
         }
 
         public string getMultiConjuction(string equation)
         {
             string[] splitEquation = equation.Split('*');
+            if (splitEquation.Contains("(0)")) return "0";
             string res = "";
             for (int i = 0; i < splitEquation.Length; i++)
             {
                 res = getConjuction(res, splitEquation[i].TrimStart('(').TrimEnd(')'));
-                if (res.Contains('V')) res = String.Join("V", TMT.deleteRepeatElementsAM(new string[] { res }));
+                if (res.Contains('V')) res = String.Join("V", TMT.reductionEquationAM(res));
             }
             return res;
         }
@@ -262,12 +267,14 @@ namespace SolutionSystemEquationMultioperations.helpers
                 }
             }
             else res = TMT.distinctWithNegative(res);
+
+            if (res == "") res = "0";
             return res;
         }
 
         public string pseudoDeMorgan(string input)
         {
-            if (input == "1") return "";
+            if (input == "1") return "0";
             if (input == "0") return "1";
             string result = "";
             string[] split = input.Split('V');
@@ -292,38 +299,45 @@ namespace SolutionSystemEquationMultioperations.helpers
         public string checkConditions(string input, bool neg, string[] conditionsSolvavility)
         {
             if (conditionsSolvavility == null) return input;
-            string[] split = TMT.deleteRepeatElementsAM(new string[] { input });
-            split = split[0].Split('V');
+            string[] splitInput = new string[] { TMT.reductionEquationAM(input) };
+            splitInput = splitInput[0].Split('V');
             string result = "";
-            bool negCon = false;
             int count = 0;
-            for (int i = 0; i < split.Length; i++)
+            string[] splitCondition = conditionsSolvavility[0].Split('V');
+            int[] indexs = new int[splitCondition.Length];
+            for (int i = 0; i < indexs.Length; i++) indexs[i] = -1;
+            bool finded = true;
+
+            int countIndex = 0;
+            foreach (string elemCondition in splitCondition)
             {
-                foreach (string condition in conditionsSolvavility)
+                for (int i = 0; i < splitInput.Length; i++)
                 {
-                    foreach (char c in condition)
+                    string[] splitElemCondition = elemCondition.Split('&');
+                    string[] splitElemInput = splitInput[i].Split('&');
+
+                    foreach(string elem in splitElemCondition)
                     {
-                        if (c == '-') negCon = true;
-                        else if (split[i].Contains(c) && !negCon)
-                        {
-                            int index = split[i].IndexOf(c);
-                            if (index > 0 && split[i][index - 1] != '-' || index == 0) count++;
-                        }
-                        else if (split[i].Contains(c) && negCon)
-                        {
-                            int index = split[i].IndexOf(c);
-                            if (index > 0 && split[i][index - 1] == '-') count += 2;
-                            negCon = false;
-                        }
+                        if (Array.Exists(splitElemInput, element => element == elem)) count++;
                     }
-                    if (count == split[i].Length) split[i] = "";
+
+                    if (count == splitElemCondition.Length)
+                    {
+                        indexs[countIndex] = i;
+                        countIndex++;
+                        count = 0;
+                        break;
+                    }
                     count = 0;
                 }
             }
 
-            foreach (string res in split) if (res != "") result += res + 'V';
+            foreach (int index in indexs) if (index == -1) finded = false;
+            if (finded) foreach (int index in indexs) splitInput[index] = "";
+            foreach (string res in splitInput) if (res != "") result += res + 'V';
             result = result.TrimEnd('V');
             if (result == "" && neg) return "1";
+            if (result == "" && !neg) return "";
             return result;
         }
 
@@ -363,19 +377,18 @@ namespace SolutionSystemEquationMultioperations.helpers
                     if (elem.Contains(key))
                     {
                         int index = elem.IndexOf(key);
-                        if (index > 0 && elem[index - 1] == '-') str += $"({getMultiConjuction(pseudoDeMorgan(arguments[key]))})*";
-                        else if (index > 0 && elem[index - 1] != '-' || index == 0) str += $"({getMultiConjuction(arguments[key])})*";
+                        if (index > 0 && elem[index - 1] == '-') str += $"({TMT.reductionEquationAM(getMultiConjuction(pseudoDeMorgan(arguments[key])))})*";
+                        else if (index > 0 && elem[index - 1] != '-' || index == 0) str += $"({TMT.reductionEquationAM(getMultiConjuction(arguments[key]))})*";
                     }
                 }
-                str = getMultiConjuction(str.TrimEnd('*'));
+                str = TMT.reductionEquationAM(getMultiConjuction(str.TrimEnd('*')));
                 if (str != "") input += str + 'V';
                 str = "";
             }
 
             if (input != "")
             {
-                split = TMT.deleteRepeatElementsAM(new string[] { input.TrimEnd('V') });
-                input = split[0];
+                input = TMT.reductionEquationAM(input.TrimEnd('V'));
             }
             return input;
         }
