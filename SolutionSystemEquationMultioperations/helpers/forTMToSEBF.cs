@@ -73,14 +73,14 @@ namespace SolutionSystemEquationMultioperations.helpers
 
         public void getEquationPresent(int rang, Dictionary<string, Multioperation> multioperations, string key)
         {
-            string[] arguments = multioperations[key].arguments;
+            string[] coefficients = multioperations[key].coefficients;
             string[][] newEquationPresent = new string[multioperations[key].codeRepresentation.Length][];
 
-            Array.Reverse(arguments);
-            foreach (string argument in arguments)
+            Array.Reverse(coefficients);
+            foreach (string coefficient in coefficients)
             {
-                if (newEquationPresent[0] == null) newEquationPresent = matrixMultiplication(rang, multioperations[argument].equationPresent, multioperations[key].codeRepresentation);
-                else newEquationPresent = matrixMultiplication(rang, multioperations[argument].equationPresent, null, newEquationPresent);
+                if (newEquationPresent[0] == null) newEquationPresent = matrixMultiplication(rang, multioperations[coefficient].equationPresent, multioperations[key].codeRepresentation);
+                else newEquationPresent = matrixMultiplication(rang, multioperations[coefficient].equationPresent, null, newEquationPresent);
             }
             multioperations[key].equationPresent = newEquationPresent;
         }
@@ -122,7 +122,7 @@ namespace SolutionSystemEquationMultioperations.helpers
                         countPartEquation++;
                         countEquationPresent = (countEquationPresent + 1) % equationPresent[0].Length;
                     }
-                    partEquation = deleteRepeatElements(partEquation);
+                    partEquation = deleteRepeatElementsAM(partEquation);
                     result[i] = partEquation;
                 }
             }
@@ -154,25 +154,24 @@ namespace SolutionSystemEquationMultioperations.helpers
                             if (newEquationPresent[i][j + k].Contains('V') && !equationPresent[k][0].Contains('V'))
                             {
                                 string[] split = newEquationPresent[i][j + k].Split('V');
-                                foreach(string temp in split) s += temp + equationPresent[k][0] + "V";
+                                foreach(string temp in split) s += $"{temp}&{equationPresent[k][0]}V";
                             }
                             else if (!newEquationPresent[i][j + k].Contains('V') && equationPresent[k][0].Contains('V'))
                             {
                                 string[] split = equationPresent[k][0].Split('V');
-                                foreach (string temp in split) s += temp + newEquationPresent[i][j + k] + "V";
+                                foreach (string temp in split) s += $"{temp}&{newEquationPresent[i][j + k]}V";
                             }
                             else
                             {
                                 string[] splitNewEquation = newEquationPresent[i][j + k].Split('V');
                                 string[] splitEquation = equationPresent[k][0].Split('V');
                                 foreach (string elemNewEquation in splitNewEquation)
-                                    foreach (string elemEquation in splitEquation)
-                                        s += elemNewEquation + elemEquation + "V";
+                                    foreach (string elemEquation in splitEquation) s += $"{elemNewEquation}&{elemEquation}V";
                             }
                         }
                         s = s.TrimEnd('V');
                         if (s == "") s = "0";
-                        s = reductionEquation(s);
+                        s = reductionEquationAM(s);
                         partEquation[countPartEquation] = s;
                         countPartEquation++;
                     }

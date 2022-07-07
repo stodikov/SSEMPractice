@@ -37,13 +37,13 @@ namespace SolutionSystemEquationMultioperations
                     if (kvp.Value.equationPresent == null)
                     {
                         int countEquations = 0;
-                        string[] arguments = kvp.Value.arguments;
-                        foreach (string argument in arguments)
+                        string[] coefficients = kvp.Value.coefficients;
+                        foreach (string coefficient in coefficients)
                         {
-                            if (multioperations[argument].equationPresent == null) break;
+                            if (multioperations[coefficient].equationPresent == null) break;
                             countEquations++;
                         }
-                        if (countEquations == arguments.Length)
+                        if (countEquations == coefficients.Length)
                         {
                             TMToSEBF.getEquationPresent(rang, multioperations, kvp.Key);
                             count++;

@@ -8,7 +8,7 @@ namespace SolutionSystemEquationMultioperations.methods
     class NumericalMethod
     {
         int[][] thurthTable;
-        Dictionary<char, int> keysArguments = new Dictionary<char, int>();
+        Dictionary<string, int> keysArguments = new Dictionary<string, int>();
         Dictionary<string, int[]> conditions = new Dictionary<string, int[]>();
         Dictionary<string, string[][]> resultsPairs = new Dictionary<string, string[][]>();
 
@@ -16,6 +16,8 @@ namespace SolutionSystemEquationMultioperations.methods
         {
             string[][] pairs;
             string[][] res = null;
+            string[] coefficientsArr = coefficients.Split('&');
+            string[] unknownsArr = unknowns.Split('&');
 
             keysArguments.Clear();
             conditions.Clear();
@@ -23,32 +25,29 @@ namespace SolutionSystemEquationMultioperations.methods
 
             if (conditionsInput != null) equation = addConditionsToEquation(equation, conditionsInput);
 
-            buildTruthTable(coefficients.Length + unknowns.Length);
-            getVectorBF(equation, coefficients + unknowns);
+            buildTruthTable(coefficientsArr.Length + unknownsArr.Length);
+            getVectorBF(equation, $"{coefficients}&{unknowns}");
 
             // Для быстрой отладки
             string vector = "";
-            for (int i = 0; i < thurthTable.Length; i++)
-            {
-                vector += thurthTable[i][thurthTable[i].Length - 1];
-            }
+            for (int i = 0; i < thurthTable.Length; i++) vector += thurthTable[i][thurthTable[i].Length - 1];
             // Для быстрой отладки
 
-            if (!solvabilityTest(coefficients, unknowns, conditionsInput)) return null;
+            if (!solvabilityTest(coefficientsArr, unknownsArr, conditionsInput)) return null;
 
             if (conditions.Count != 0)
             {
                 foreach (KeyValuePair<string, int[]> kvpCondition in conditions)
                 {
-                    pairs = getPairsForResult(coefficients, unknowns, kvpCondition);
-                    res = getResultPairs(rang, pairs, unknowns);
+                    pairs = getPairsForResult(coefficientsArr, unknownsArr, kvpCondition);
+                    res = getResultPairs(rang, pairs, unknownsArr);
                     resultsPairs.Add(kvpCondition.Key, res);
                 }
             }
             else
             {
-                pairs = getPairsForResult(coefficients, unknowns);
-                res = getResultPairs(rang, pairs, unknowns);
+                pairs = getPairsForResult(coefficientsArr, unknownsArr);
+                res = getResultPairs(rang, pairs, unknownsArr);
                 resultsPairs.Add("no conditions", res);
             }
             return resultsPairs;
@@ -81,17 +80,17 @@ namespace SolutionSystemEquationMultioperations.methods
             switch (operatorCondition)
             {
                 case "!=":
-                    equationConditions += $"{arguments[0]}{arguments[1]}V-{arguments[0]}-{arguments[1]}<0";
+                    equationConditions += $"{arguments[0]}&{arguments[1]}V-{arguments[0]}&-{arguments[1]}<0";
                     break;
             }
             return equationConditions;
         }
 
-        private void buildTruthTable(int countAgruments)
+        private void buildTruthTable(int countCoefficients)
         {
-            int countCols = (int)Math.Pow(2, countAgruments), countSwitch = (int)Math.Pow(2, countAgruments) / 2, count = 0, value = 0;
+            int countCols = (int)Math.Pow(2, countCoefficients), countSwitch = (int)Math.Pow(2, countCoefficients) / 2, count = 0, value = 0;
             thurthTable = new int[countCols][];
-            for (int i = 0; i < thurthTable.Length; i++) thurthTable[i] = new int[countAgruments + 1];
+            for (int i = 0; i < thurthTable.Length; i++) thurthTable[i] = new int[countCoefficients + 1];
             for (int i = 0; i < thurthTable[i].Length - 1; i++)
             {
                 for (int j = 0; j < countCols; j++)
@@ -114,7 +113,8 @@ namespace SolutionSystemEquationMultioperations.methods
         private void getVectorBF(string[][] equation, string arguments)
         {
             int resValue = -1;
-            for (int i = 0; i < arguments.Length; i++) keysArguments.Add(arguments[i], i);
+            string[] argumentsArr = arguments.Split('&');
+            for (int i = 0; i < argumentsArr.Length; i++) keysArguments.Add(argumentsArr[i], i);
             for (int t = 0; t < thurthTable.Length; t++)
             {
                 int[] tempRes = new int[equation.Length];
@@ -163,18 +163,20 @@ namespace SolutionSystemEquationMultioperations.methods
 
         private int getValueOnSet(string equation, int set)
         {
+            string[] equationArr = equation.Split('&');
             int res = 1;
             bool neg = false;
-            foreach (char e in equation)
+            foreach (string e in equationArr)
             {
-                if (e == '-')
+                string elem = e;
+                if (e[0] == '-')
                 {
                     neg = true;
-                    continue;
+                    elem = e.TrimStart('-');
                 }
                 if (neg)
                 {
-                    int t = thurthTable[set][keysArguments[e]];
+                    int t = thurthTable[set][keysArguments[elem]];
                     t = (t == 0) ? 1 : 0;
                     res *= t;
                     neg = false;
@@ -185,7 +187,7 @@ namespace SolutionSystemEquationMultioperations.methods
             return res;
         }
 
-        private bool solvabilityTest(string coefficients, string unknowns, string[] conditionInput = null)
+        private bool solvabilityTest(string[] coefficients, string[] unknowns, string[] conditionInput = null)
         {
             if (coefficients.Length == 0) return true;
             int sizeCol = (int)Math.Pow(2, coefficients.Length), sizeRow = (int)Math.Pow(2, unknowns.Length),
@@ -196,7 +198,7 @@ namespace SolutionSystemEquationMultioperations.methods
             string index = "";
             for (int set = 0; set < thurthTable.Length; set++)
             {
-                foreach (char u in unknowns) index += Convert.ToString(thurthTable[set][keysArguments[u]]);
+                foreach (string u in unknowns) index += Convert.ToString(thurthTable[set][keysArguments[u]]);
                 residual[Convert.ToInt32(index, 2)][countResidual] = thurthTable[set][thurthTable[set].Length - 1];
                 index = "";
                 countCleaning++;
@@ -231,7 +233,7 @@ namespace SolutionSystemEquationMultioperations.methods
                         binarySet_string = temp + binarySet_string;
                     }
                     for (int j = 0; j < binarySet_string.Length; j++) binarySet_int[j] = binarySet_string[j] - '0';
-                    binarySet_string = coefficients + binarySet_string;
+                    binarySet_string = $"{String.Join("&", coefficients)}|{binarySet_string}";
                     conditions.Add(binarySet_string, binarySet_int);
                 }
             }
@@ -240,14 +242,12 @@ namespace SolutionSystemEquationMultioperations.methods
             return flag;
         }
 
-        private string[][] getPairsForResult(string coefficients, string unknowns, KeyValuePair<string, int[]> kvpCondition = new KeyValuePair<string, int[]>())
+        private string[][] getPairsForResult(string[] coefficients, string[] unknowns, KeyValuePair<string, int[]> kvpCondition = new KeyValuePair<string, int[]>())
         {
-            int sizePairs = (int)Math.Pow(2, coefficients.Length), countPairs = 0, countCleaning = 0, sizeKey = 0;
+            int sizePairs = (int)Math.Pow(2, coefficients.Length), countPairs = 0, countCleaning = 0;
             string[][] pairs = new string[(int)Math.Pow(2, unknowns.Length)][];
             string temp = "", value = "";
             bool flag = true;
-
-            if (kvpCondition.Key != null) sizeKey = kvpCondition.Key.Length / 2;
 
             for (int i = 0; i < thurthTable.Length; i++)
             {
@@ -255,10 +255,14 @@ namespace SolutionSystemEquationMultioperations.methods
                 if (thurthTable[i][thurthTable[i].Length - 1] == 0)
                 {
                     if (kvpCondition.Key == null) flag = true;
-                    else for (int j = 0; j < sizeKey; j++) if (thurthTable[i][keysArguments[kvpCondition.Key[j]]] != kvpCondition.Value[j]) flag = false;
+                    else
+                    {
+                        string[] coefficientsCondition = kvpCondition.Key.Split('|')[0].Split('&');
+                        for (int j = 0; j < coefficientsCondition.Length; j++) if (thurthTable[i][keysArguments[coefficientsCondition[j]]] != kvpCondition.Value[j]) flag = false;
+                    }
                     if (flag)
                     {
-                        foreach (char u in unknowns) temp += Convert.ToString(thurthTable[i][keysArguments[u]]);
+                        foreach (string u in unknowns) temp += Convert.ToString(thurthTable[i][keysArguments[$"{u}"]]);
                         if (temp != "")
                         {
                             if (countCleaning != sizePairs)
@@ -300,7 +304,7 @@ namespace SolutionSystemEquationMultioperations.methods
             return res;
         }
 
-        private string[][] getResultPairs(int rang, string[][] pairs, string unknowns)
+        private string[][] getResultPairs(int rang, string[][] pairs, string[] unknowns)
         {
             int countResPairs = pairs[0].Length, slice = 0, count = 0;
             string[][] resPairs;

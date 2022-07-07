@@ -142,7 +142,7 @@
             this.textBox_coefficients.Name = "textBox_coefficients";
             this.textBox_coefficients.Size = new System.Drawing.Size(148, 180);
             this.textBox_coefficients.TabIndex = 9;
-            this.textBox_coefficients.Text = "z|x,y,q,w,e";
+            this.textBox_coefficients.Text = "z";
             // 
             // label_coefficients
             // 
@@ -162,7 +162,7 @@
             this.textBox_unknows.Name = "textBox_unknows";
             this.textBox_unknows.Size = new System.Drawing.Size(148, 180);
             this.textBox_unknows.TabIndex = 11;
-            this.textBox_unknows.Text = "u|l,b,r,t,o";
+            this.textBox_unknows.Text = "u";
             // 
             // label_unknows
             // 

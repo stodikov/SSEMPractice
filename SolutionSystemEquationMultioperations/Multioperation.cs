@@ -9,13 +9,13 @@ namespace SolutionSystemEquationMultioperations
     {
         public string designation { get; set; }
         public int[][] codeRepresentation { get; set; }
-        public string[] arguments { get; set; }
+        public string[] coefficients { get; set; }
         public string[][] equationPresent { get; set; }
 
-        public Multioperation(string designation, int[][] codeRepresentation = null, string[] arguments = null, string[][] equationPresent = null)
+        public Multioperation(string designation, int[][] codeRepresentation = null, string[] coefficients = null, string[][] equationPresent = null)
         {
             this.designation = designation;
-            this.arguments = arguments;
+            this.coefficients = coefficients;
             this.codeRepresentation = codeRepresentation;
             this.equationPresent = equationPresent;
         }

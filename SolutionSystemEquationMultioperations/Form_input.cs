@@ -33,8 +33,8 @@ namespace SolutionSystemEquationMultioperations
             char[] forTrim = new char[] { '\r', '\n', ' ' };
             string[] equationsInput = textBox_Equation.Text.Trim(forTrim).Replace("\r", "").Split('\n');
             string[] multioperationsInput = textBox_Multioperations.Text.Trim(forTrim).Replace("\r", "").Split('\n');
-            string[] coefficientsInput = textBox_coefficients.Text.Trim(forTrim).Replace("\r", "").Split('\n');
-            string[] unknownsInput = textBox_unknows.Text.Trim(forTrim).Replace("\r", "").Split('\n');
+            string[] coefficientsInput = textBox_coefficients.Text.Trim(forTrim).Split(',');
+            string[] unknownsInput = textBox_unknows.Text.Trim(forTrim).Split(',');
             string[] conditionsInput = textBox_conditions.Text.Trim(forTrim).Replace("\r", "").Split('\n');
             int rang = Convert.ToInt32(textBox_Rang.Text);
             string[] splitInput;
@@ -104,55 +104,56 @@ namespace SolutionSystemEquationMultioperations
             
             if (coefficientsInput[0] != "")
             {
-                foreach (string s in coefficientsInput)
+                foreach (string coefficient in coefficientsInput)
                 {
-                    string designation = s.Split('|')[0];
-                    string[] elements = s.Split('|')[1].Split(',');
-                    string[][] newEquation = new string[elements.Length][];
-                    for (int i = 0; i < elements.Length; i++)
+                    string[][] newEquation = new string[rang][];
+                    for (int i = 0; i < rang; i++)
                     {
-                        newEquation[i] = new string[] { elements[i] };
-                        coefficients += elements[i];
+                        newEquation[i] = new string[] { $"{coefficient}{i + 1}" };
+                        coefficients += $"{coefficient}{i + 1}&";
                     }
-                    multioperations.Add(designation, new Multioperation(designation, null, null, newEquation));
+                    multioperations.Add(coefficient, new Multioperation(coefficient, null, null, newEquation));
                 }
+                coefficients = coefficients.TrimEnd('&');
             }
 
-            foreach (string s in unknownsInput)
+            foreach (string unknown in unknownsInput)
             {
-                string designation = s.Split('|')[0];
-                string[] elements = s.Split('|')[1].Split(',');
-                string[][] newEquation = new string[elements.Length][];
-                for (int i = 0; i < elements.Length; i++)
+                string[][] newEquation = new string[rang][];
+                for (int i = 0; i < rang; i++)
                 {
-                    newEquation[i] = new string[] { elements[i] };
-                    unknowns += elements[i];
+                    newEquation[i] = new string[] { $"{unknown}{i + 1}" };
+                    unknowns += $"{unknown}{i + 1}&";
                 }
-                multioperations.Add(designation, new Multioperation(designation, null, null, newEquation));
+                multioperations.Add(unknown, new Multioperation(unknown, null, null, newEquation));
             }
+            unknowns = unknowns.TrimEnd('&');
 
             Dictionary<string, string[][]> resultEquation = controller.start(rang, multioperations, conditionsInput, equations, coefficients, unknowns, method);
 
             textBox_resualEquation.Text = "";
+            string[] unknownsArr = unknowns.Split('&');
             foreach (KeyValuePair<string, string[][]> kvpRes in resultEquation)
             {
                 string condition = kvpRes.Key;
                 string[][] resValue = kvpRes.Value;
                 string answer = "";
-                int midCondition = condition.Length / 2;
+                //int midCondition = condition.Length / 2;
 
                 if (condition == "no conditions" || condition == "") answer += "Условий нет";
                 else
                 {
+                    string[] conditionSplit = condition.Split('|');
+                    string[] conditionCoefficients = conditionSplit[0].Split('&');
                     answer += "При ";
-                    for (int i = 0; i < midCondition; i++) answer += $"{condition[i]} = {condition[i + midCondition]}, ";
+                    for (int i = 0; i < conditionCoefficients.Length; i++) answer += $"{conditionCoefficients[i]} = {conditionSplit[1][i]}, ";
                 }
                 answer = answer.TrimEnd(new char[] { ' ', ',' }) + "\r\n";
                 if (formatAnswer == "horizontal")
                 {
-                    for (int i = 0; i < unknowns.Length; i++)
+                    for (int i = 0; i < unknownsArr.Length; i++)
                     {
-                        for (int j = 0; j < resValue.Length; j++) answer += unknowns[i] + " = " + resValue[j][i] + "   ";
+                        for (int j = 0; j < resValue.Length; j++) answer += unknownsArr[i] + " = " + resValue[j][i] + "   ";
                         answer += "\r\n";
                     }
                     answer += "\r\n";
@@ -161,7 +162,7 @@ namespace SolutionSystemEquationMultioperations
                 {
                     for (int i = 0; i < resValue.Length; i++)
                     {
-                        for (int j = 0; j < unknowns.Length; j++) answer += unknowns[j] + " = " + resValue[i][j] + "\r\n";
+                        for (int j = 0; j < unknownsArr.Length; j++) answer += unknownsArr[j] + " = " + resValue[i][j] + "\r\n";
                         answer += "\r\n";
                     }
                 }
