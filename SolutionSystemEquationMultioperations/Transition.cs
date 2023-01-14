@@ -5,12 +5,28 @@ using System.Text;
 
 namespace SolutionSystemEquationMultioperations
 {
-    class TransformationMultioperationToSystemEquationBF
+    class Transition
     {
-        public string[][] transformation(int rang, Dictionary<string, Multioperation> multioperations, string equation)
+        public string[][] getSystemEquation(int rang, string[] equations, Dictionary<string, Multioperation> multioperations)
         {
+            int rowSystem = 0;
+            string[][] systemEquation = new string[rang * equations.Length][];
+            foreach (string equation in equations)
+            {
+                string[][] system = getTransition(rang, multioperations, equation);
+                for (int i = 0; i < system.Length; i++)
+                {
+                    systemEquation[rowSystem] = system[i];
+                    rowSystem++;
+                }
+            }
+            return systemEquation;
+        }
+
+        private string[][] getTransition(int rang, Dictionary<string, Multioperation> multioperations, string equation)
+        {
+            Redefinition(rang, multioperations);
             string[] equationSplit = equation.Split('<');
-            redefinition(rang, multioperations);
             string[][] equationLeftPart = multioperations[equationSplit[0]].equationPresent;
             string[][] equationRightPart = multioperations[equationSplit[1]].equationPresent;
             string[][] result = new string[equationLeftPart.Length][];
@@ -25,9 +41,9 @@ namespace SolutionSystemEquationMultioperations
             return result;
         }
 
-        private void redefinition(int rang, Dictionary<string, Multioperation> multioperations)
+        private void Redefinition(int rang, Dictionary<string, Multioperation> multioperations)
         {
-            helpers.forTMToSEBF TMToSEBF = new helpers.forTMToSEBF();
+            helpers.GeneralFunctionsTransition TMToSEBF = new helpers.GeneralFunctionsTransition();
             bool flag = true;
             while (flag)
             {

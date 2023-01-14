@@ -16,8 +16,8 @@ namespace SolutionSystemEquationMultioperations.methods
         {
             string[][] pairs;
             string[][] res = null;
-            string[] coefficientsArr = coefficients.Split('&');
-            string[] unknownsArr = unknowns.Split('&');
+            string[] coefficientsArr = coefficients == "" ? new string[0] : coefficients.Split(',');
+            string[] unknownsArr = unknowns.Split(',');
 
             keysArguments.Clear();
             conditions.Clear();
@@ -26,7 +26,7 @@ namespace SolutionSystemEquationMultioperations.methods
             if (conditionsInput != null) equation = addConditionsToEquation(equation, conditionsInput);
 
             buildTruthTable(coefficientsArr.Length + unknownsArr.Length);
-            getVectorBF(equation, $"{coefficients}&{unknowns}");
+            getVectorBF(equation, $"{coefficients},{unknowns}".Trim(','));
 
             // Для быстрой отладки
             string vector = "";
@@ -35,6 +35,7 @@ namespace SolutionSystemEquationMultioperations.methods
 
             if (!solvabilityTest(coefficientsArr, unknownsArr, conditionsInput)) return null;
 
+            resultsPairs.Add("unknowns", new string[][] { unknownsArr });
             if (conditions.Count != 0)
             {
                 foreach (KeyValuePair<string, int[]> kvpCondition in conditions)
@@ -113,7 +114,7 @@ namespace SolutionSystemEquationMultioperations.methods
         private void getVectorBF(string[][] equation, string arguments)
         {
             int resValue = -1;
-            string[] argumentsArr = arguments.Split('&');
+            string[] argumentsArr = arguments.Split(',');
             for (int i = 0; i < argumentsArr.Length; i++) keysArguments.Add(argumentsArr[i], i);
             for (int t = 0; t < thurthTable.Length; t++)
             {
@@ -233,7 +234,7 @@ namespace SolutionSystemEquationMultioperations.methods
                         binarySet_string = temp + binarySet_string;
                     }
                     for (int j = 0; j < binarySet_string.Length; j++) binarySet_int[j] = binarySet_string[j] - '0';
-                    binarySet_string = $"{String.Join("&", coefficients)}|{binarySet_string}";
+                    binarySet_string = $"{String.Join(",", coefficients)}|{binarySet_string}";
                     conditions.Add(binarySet_string, binarySet_int);
                 }
             }
@@ -257,7 +258,7 @@ namespace SolutionSystemEquationMultioperations.methods
                     if (kvpCondition.Key == null) flag = true;
                     else
                     {
-                        string[] coefficientsCondition = kvpCondition.Key.Split('|')[0].Split('&');
+                        string[] coefficientsCondition = kvpCondition.Key.Split('|')[0].Split(',');
                         for (int j = 0; j < coefficientsCondition.Length; j++) if (thurthTable[i][keysArguments[coefficientsCondition[j]]] != kvpCondition.Value[j]) flag = false;
                     }
                     if (flag)

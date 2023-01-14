@@ -7,37 +7,65 @@ namespace SolutionSystemEquationMultioperations
 {
     class Controller
     {
-        TransformationMultioperationToSystemEquationBF MOtoSEBF = new TransformationMultioperationToSystemEquationBF();
+        PrepairingData data = new PrepairingData();
+        Transition transition = new Transition();
         methods.NumericalMethod NM = new methods.NumericalMethod();
         methods.AnalyticalMethod AM = new methods.AnalyticalMethod();
-        Form_Output formOutput = new Form_Output();
 
-        public Dictionary<string, string[][]> start(int rang, Dictionary<string, Multioperation> multioperations, string[] conditionsInput, string[] equations, string coefficients, string unknowns, string method)
+        public Dictionary<string, string[][]> Start(string rang, string equation, string multioperation, string coefficients, string unknowns, string conditions, bool method)
         {
-            int rowSystem = 0;
-            string[][] systemEquation = new string[rang * equations.Length][];
-            foreach(string equation in equations)
+            Dictionary<string, string[][]> result = new Dictionary<string, string[][]>();
+            data.PreparingData(rang, equation, multioperation, coefficients, unknowns, conditions, method);
+
+            if (data.error != "")
             {
-                string[][] system = MOtoSEBF.transformation(rang, multioperations, equation);
-                for (int i = 0; i < system.Length; i++)
-                {
-                    systemEquation[rowSystem] = system[i];
-                    rowSystem++;
-                }
+                result.Add("error", new string[][] { new string[] { data.error } });
+                return result;
             }
-            
-            switch (method)
+
+            string[][] systemEquation = transition.getSystemEquation(data.rang, data.equations, data.multioperations);
+
+
+            switch (data.method)
             {
                 //case "analytical":
                 //    if (conditionsInput.Length == 1 && conditionsInput[0] == "") return AM.getSolution(systemEquation, coefficients, unknowns);
                 //    else return AM.getSolution(systemEquation, coefficients, unknowns, conditionsInput);
                 case "numeric":
-                    if (conditionsInput.Length == 1 && conditionsInput[0] == "") return NM.getSolution(rang, systemEquation, coefficients, unknowns);
-                    else return NM.getSolution(rang, systemEquation, coefficients, unknowns, conditionsInput);
+                    if (data.conditions == null) return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns);
+                    else return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns, data.conditions);
                 default:
-                    if (conditionsInput.Length == 1 && conditionsInput[0] == "") return NM.getSolution(rang, systemEquation, coefficients, unknowns);
-                    else return NM.getSolution(rang, systemEquation, coefficients, unknowns, conditionsInput);
+                    if (data.conditions == null) return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns);
+                    else return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns, data.conditions);
             }
         }
+
+        //public Dictionary<string, string[][]> start(int rang, Dictionary<string, Multioperation> multioperations, string[] conditionsInput, string[] equations, string coefficients, string unknowns, string method)
+        //{
+        //    int rowSystem = 0;
+        //    string[][] systemEquation = new string[rang * equations.Length][];
+        //    foreach(string equation in equations)
+        //    {
+        //        string[][] system = MOtoSEBF.transformation(rang, multioperations, equation);
+        //        for (int i = 0; i < system.Length; i++)
+        //        {
+        //            systemEquation[rowSystem] = system[i];
+        //            rowSystem++;
+        //        }
+        //    }
+            
+        //    switch (method)
+        //    {
+        //        //case "analytical":
+        //        //    if (conditionsInput.Length == 1 && conditionsInput[0] == "") return AM.getSolution(systemEquation, coefficients, unknowns);
+        //        //    else return AM.getSolution(systemEquation, coefficients, unknowns, conditionsInput);
+        //        case "numeric":
+        //            if (conditionsInput.Length == 1 && conditionsInput[0] == "") return NM.getSolution(rang, systemEquation, coefficients, unknowns);
+        //            else return NM.getSolution(rang, systemEquation, coefficients, unknowns, conditionsInput);
+        //        default:
+        //            if (conditionsInput.Length == 1 && conditionsInput[0] == "") return NM.getSolution(rang, systemEquation, coefficients, unknowns);
+        //            else return NM.getSolution(rang, systemEquation, coefficients, unknowns, conditionsInput);
+        //    }
+        //}
     }
 }

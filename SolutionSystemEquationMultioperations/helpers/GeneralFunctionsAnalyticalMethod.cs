@@ -7,7 +7,7 @@ namespace SolutionSystemEquationMultioperations.helpers
 {
     class GeneralFunctionsAnalyticalMethod
     {
-        forTMToSEBF TMT = new forTMToSEBF();
+        GeneralFunctionsBF general = new GeneralFunctionsBF();
 
         public Dictionary<string, Dictionary<string, int>> getConditions(string[][] splitCon, string equation)
         {
@@ -197,7 +197,7 @@ namespace SolutionSystemEquationMultioperations.helpers
             for (int i = 0; i < splitEquation.Length; i++)
             {
                 res = getConjuction(res, splitEquation[i].TrimStart('(').TrimEnd(')'));
-                if (res.Contains('V')) res = String.Join("V", TMT.reductionEquationAM(res));
+                if (res.Contains('V')) res = String.Join("V", general.ReductionEquation(res));
             }
             return res;
         }
@@ -262,11 +262,11 @@ namespace SolutionSystemEquationMultioperations.helpers
                 res = "";
                 foreach (string res1 in splitRes)
                 {
-                    if (res == "") res += TMT.distinctWithNegative(res1);
-                    else res += 'V' + TMT.distinctWithNegative(res1);
+                    if (res == "") res += general.DistinctWithNegative(res1);
+                    else res += 'V' + general.DistinctWithNegative(res1);
                 }
             }
-            else res = TMT.distinctWithNegative(res);
+            else res = general.DistinctWithNegative(res);
 
             if (res == "") res = "0";
             return res;
@@ -299,7 +299,7 @@ namespace SolutionSystemEquationMultioperations.helpers
         public string checkConditions(string input, bool neg, string[] conditionsSolvavility)
         {
             if (conditionsSolvavility == null) return input;
-            string[] splitInput = new string[] { TMT.reductionEquationAM(input) };
+            string[] splitInput = new string[] { general.ReductionEquation(input) };
             splitInput = splitInput[0].Split('V');
             string result = "";
             int count = 0;
@@ -377,18 +377,18 @@ namespace SolutionSystemEquationMultioperations.helpers
                     if (elem.Contains(key))
                     {
                         int index = elem.IndexOf(key);
-                        if (index > 0 && elem[index - 1] == '-') str += $"({TMT.reductionEquationAM(getMultiConjuction(pseudoDeMorgan(arguments[key])))})*";
-                        else if (index > 0 && elem[index - 1] != '-' || index == 0) str += $"({TMT.reductionEquationAM(getMultiConjuction(arguments[key]))})*";
+                        if (index > 0 && elem[index - 1] == '-') str += $"({general.ReductionEquation(getMultiConjuction(pseudoDeMorgan(arguments[key])))})*";
+                        else if (index > 0 && elem[index - 1] != '-' || index == 0) str += $"({general.ReductionEquation(getMultiConjuction(arguments[key]))})*";
                     }
                 }
-                str = TMT.reductionEquationAM(getMultiConjuction(str.TrimEnd('*')));
+                str = general.ReductionEquation(getMultiConjuction(str.TrimEnd('*')));
                 if (str != "") input += str + 'V';
                 str = "";
             }
 
             if (input != "")
             {
-                input = TMT.reductionEquationAM(input.TrimEnd('V'));
+                input = general.ReductionEquation(input.TrimEnd('V'));
             }
             return input;
         }

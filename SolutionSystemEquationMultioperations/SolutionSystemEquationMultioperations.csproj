@@ -44,33 +44,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form_Output.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form_Output.Designer.cs">
-      <DependentUpon>Form_Output.cs</DependentUpon>
-    </Compile>
     <Compile Include="Form_Input.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form_Input.Designer.cs">
       <DependentUpon>Form_Input.cs</DependentUpon>
     </Compile>
-    <Compile Include="helpers\forTMToSEBF.cs" />
-    <Compile Include="helpers\GeneralFunctionsAnalyticalMethod.cs" />
-    <Compile Include="helpers\parseMultioperations.cs" />
-    <Compile Include="methods\AnalyticalMethod.cs" />
+    <Compile Include="Helpers\GeneralFunctionsTransition.cs" />
+    <Compile Include="Helpers\GeneralFunctionsBF.cs" />
+    <Compile Include="Helpers\GeneralFunctionsAnalyticalMethod.cs" />
+    <Compile Include="Helpers\parseMultioperations.cs" />
+    <Compile Include="Methods\AnalyticalMethod.cs" />
     <Compile Include="Multioperation.cs" />
-    <Compile Include="methods\NumericalMethod.cs" />
+    <Compile Include="Methods\NumericalMethod.cs" />
+    <Compile Include="PrepairingData.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controller.cs" />
-    <Compile Include="TransformationMultioperationToSystemEquationBF.cs" />
+    <Compile Include="Transition.cs" />
     <EmbeddedResource Include="Form_Input.resx">
       <DependentUpon>Form_Input.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Form_output.resx">
-      <DependentUpon>Form_Output.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

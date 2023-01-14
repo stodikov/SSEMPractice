@@ -7,8 +7,8 @@ namespace SolutionSystemEquationMultioperations.methods
 {
     class AnalyticalMethod
     {
-        helpers.forTMToSEBF TMT = new helpers.forTMToSEBF();
-        helpers.GeneralFunctionsAnalyticalMethod gf = new helpers.GeneralFunctionsAnalyticalMethod();
+        helpers.GeneralFunctionsBF generalBF = new helpers.GeneralFunctionsBF();
+        helpers.GeneralFunctionsAnalyticalMethod generalAM = new helpers.GeneralFunctionsAnalyticalMethod();
 
         Dictionary<string, string> formulsUnknows = new Dictionary<string, string>();
         Dictionary<string, string> disclosedFormulsUnknows = new Dictionary<string, string>();
@@ -56,13 +56,13 @@ namespace SolutionSystemEquationMultioperations.methods
             for (int i = 0; i < equationTemp.Length; i++)
             {
                 string[] splitEquation = equationTemp[i].Split('<');
-                string leftPartEquation = $"({TMT.reductionEquationAM(translateFormul(splitEquation[0]))})";
-                string rightPartEquation = $"({TMT.reductionEquationAM(gf.getMultiConjuction(gf.pseudoDeMorgan(translateFormul(splitEquation[1]))))})";
+                string leftPartEquation = $"({generalBF.ReductionEquation(translateFormul(splitEquation[0]))})";
+                string rightPartEquation = $"({generalBF.ReductionEquation(generalAM.getMultiConjuction(generalAM.pseudoDeMorgan(translateFormul(splitEquation[1]))))})";
 
                 if (rightPartEquation == "(0)" || leftPartEquation == "(0)") continue;
                 if (rightPartEquation == "(1)") fullEquation += leftPartEquation.Trim(new char[] { '(', ')' }) + 'V';
                 else if (leftPartEquation == "(1)") fullEquation += rightPartEquation.Trim(new char[] { '(', ')' }) + 'V';
-                else fullEquation += TMT.reductionEquationAM(gf.getMultiConjuction($"{leftPartEquation}*{rightPartEquation}")) + 'V';
+                else fullEquation += generalBF.ReductionEquation(generalAM.getMultiConjuction($"{leftPartEquation}*{rightPartEquation}")) + 'V';
             }
             fullEquation = fullEquation.TrimEnd('V');
             //тест
@@ -71,8 +71,8 @@ namespace SolutionSystemEquationMultioperations.methods
             //тест
             //fullEquation = translateFormul(fullEquation);
             if (conditionInput != null) fullEquation += 'V' + translateFormul(equationForConditions(conditionInput));
-            fullEquation = String.Join("V", TMT.reductionEquationAM(fullEquation));
-            resultDerivative = TMT.reductionEquationAM(gf.getMultiConjuction(gf.getDerivativesGivesUnknows(fullEquation, unknows)));
+            fullEquation = String.Join("V", generalBF.ReductionEquation(fullEquation));
+            resultDerivative = generalBF.ReductionEquation(generalAM.getMultiConjuction(generalAM.getDerivativesGivesUnknows(fullEquation, unknows)));
             if (resultDerivative == "1") return false;
             if (resultDerivative != "") conditionsSolvavility = new string[] { resultDerivative };
             return true;
@@ -117,24 +117,24 @@ namespace SolutionSystemEquationMultioperations.methods
             for (int i = 0; i < unknows.Length; i++)
             {
                 unknowsTemp = unknowsTemp.Replace(Convert.ToString(unknows[i]), "");
-                if (unknowsTemp.Length > 0) m = TMT.reductionEquationAM(gf.getMultiConjuction(gf.getDerivativesGivesUnknows(equation_temp, unknowsTemp)));
+                if (unknowsTemp.Length > 0) m = generalBF.ReductionEquation(generalAM.getMultiConjuction(generalAM.getDerivativesGivesUnknows(equation_temp, unknowsTemp)));
                 else m = equation_temp;
 
                 if (m != "")
                 {
-                    derivative0 = TMT.reductionEquationAM(gf.checkConditions(gf.getDerivative(m, Convert.ToString(unknows[i]), 0), false, conditionsSolvavility));
-                    derivative1 = TMT.reductionEquationAM(gf.checkConditions(gf.getDerivative(m, Convert.ToString(unknows[i]), 1), true, conditionsSolvavility));
+                    derivative0 = generalBF.ReductionEquation(generalAM.checkConditions(generalAM.getDerivative(m, Convert.ToString(unknows[i]), 0), false, conditionsSolvavility));
+                    derivative1 = generalBF.ReductionEquation(generalAM.checkConditions(generalAM.getDerivative(m, Convert.ToString(unknows[i]), 1), true, conditionsSolvavility));
 
-                    if (derivative0 != "" && derivative1 != "") formulsUnknows.Add(Convert.ToString(unknows[i]), TMT.reductionEquationAM(gf.getMultiConjuction($"A{i}*{derivative0}")) + "V" + TMT.reductionEquationAM(gf.getMultiConjuction($"(-A{i})*{gf.pseudoDeMorgan(derivative1)}")));
-                    if (derivative0 == "" && derivative1 != "") formulsUnknows.Add(Convert.ToString(unknows[i]), TMT.reductionEquationAM(gf.getMultiConjuction($"(-A{i})*{gf.pseudoDeMorgan(derivative1)})")));
-                    if (derivative0 != "" && derivative1 == "") formulsUnknows.Add(Convert.ToString(unknows[i]), TMT.reductionEquationAM(gf.getMultiConjuction($"A{i}*{derivative0}")));
+                    if (derivative0 != "" && derivative1 != "") formulsUnknows.Add(Convert.ToString(unknows[i]), generalBF.ReductionEquation(generalAM.getMultiConjuction($"A{i}*{derivative0}")) + "V" + generalBF.ReductionEquation(generalAM.getMultiConjuction($"(-A{i})*{generalAM.pseudoDeMorgan(derivative1)}")));
+                    if (derivative0 == "" && derivative1 != "") formulsUnknows.Add(Convert.ToString(unknows[i]), generalBF.ReductionEquation(generalAM.getMultiConjuction($"(-A{i})*{generalAM.pseudoDeMorgan(derivative1)})")));
+                    if (derivative0 != "" && derivative1 == "") formulsUnknows.Add(Convert.ToString(unknows[i]), generalBF.ReductionEquation(generalAM.getMultiConjuction($"A{i}*{derivative0}")));
                     if (derivative0 == "" && derivative1 == "") formulsUnknows.Add(Convert.ToString(unknows[i]), "");
                 }
                 else formulsUnknows.Add(Convert.ToString(unknows[i]), $"-A{i}");
 
                 if (formulsUnknows[Convert.ToString(unknows[i])] != "") formulsArbitraryBF.Add($"A{i}", "");
 
-                equation_temp = gf.substitution(equation_temp, formulsUnknows);
+                equation_temp = generalAM.substitution(equation_temp, formulsUnknows);
             }
         }
 
@@ -193,7 +193,7 @@ namespace SolutionSystemEquationMultioperations.methods
             Dictionary<string, Dictionary<string, int>> conditions = new Dictionary<string, Dictionary<string, int>>();
 
             for (int i = 0; i < splitV.Length; i++) splitCon[i] = splitV[i].Split('&');
-            conditions = gf.getConditions(splitCon, conditionsSolvavility[0]);
+            conditions = generalAM.getConditions(splitCon, conditionsSolvavility[0]);
             foreach (KeyValuePair<string, Dictionary<string, int>> condition in conditions)
             {
                 string unnecessaryIndexs = allIndexs;
@@ -203,7 +203,7 @@ namespace SolutionSystemEquationMultioperations.methods
                 foreach (KeyValuePair<string, string> kvp in formulsArbitraryBF.ToArray())
                 {
                     string formula = kvp.Value;
-                    foreach (KeyValuePair<string, int> arguments in condition.Value) formula = gf.getDerivative(formula, arguments.Key, arguments.Value); 
+                    foreach (KeyValuePair<string, int> arguments in condition.Value) formula = generalAM.getDerivative(formula, arguments.Key, arguments.Value); 
 
                     if (!formulsArbitraryBFWithConditions.ContainsKey(kvp.Key))
                         formulsArbitraryBFWithConditions.Add(kvp.Key, formula);
@@ -213,9 +213,9 @@ namespace SolutionSystemEquationMultioperations.methods
                 foreach (KeyValuePair<string, string> kvp in formulsUnknows.ToArray())
                 {
                     string formula = kvp.Value;
-                    foreach (KeyValuePair<string, int> arguments in condition.Value) formula = gf.getDerivative(formula, arguments.Key, arguments.Value);
+                    foreach (KeyValuePair<string, int> arguments in condition.Value) formula = generalAM.getDerivative(formula, arguments.Key, arguments.Value);
 
-                    formula = gf.substitution(formula, formulsArbitraryBFWithConditions);
+                    formula = generalAM.substitution(formula, formulsArbitraryBFWithConditions);
 
                     if (!disclosedFormulsUnknows.ContainsKey(kvp.Key))
                         disclosedFormulsUnknows.Add(kvp.Key, formula);
@@ -246,7 +246,7 @@ namespace SolutionSystemEquationMultioperations.methods
             foreach (KeyValuePair<string, string> kvp in formulsUnknows.ToArray())
             {
                 string formula = kvp.Value;
-                formula = gf.substitution(formula, formulsArbitraryBF);
+                formula = generalAM.substitution(formula, formulsArbitraryBF);
 
                 if (!disclosedFormulsUnknows.ContainsKey(kvp.Key))
                     disclosedFormulsUnknows.Add(kvp.Key, formula);
@@ -317,7 +317,7 @@ namespace SolutionSystemEquationMultioperations.methods
                     if (tempglobal_res == "") res = "0|" + res;
                     else
                     {
-                        tempglobal_res = TMT.reductionEquationAM(tempglobal_res).TrimEnd('V');
+                        tempglobal_res = generalBF.ReductionEquation(tempglobal_res).TrimEnd('V');
                         res = $"{tempglobal_res}|" + res;
                     }
                 }
