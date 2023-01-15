@@ -41,21 +41,13 @@
             this.label_unknows = new System.Windows.Forms.Label();
             this.label_conditions = new System.Windows.Forms.Label();
             this.textBox_conditions = new System.Windows.Forms.TextBox();
-            this.radioButton_AM = new System.Windows.Forms.RadioButton();
-            this.radioButton_NM = new System.Windows.Forms.RadioButton();
             this.groupBox_Equation = new System.Windows.Forms.GroupBox();
             this.Rang = new System.Windows.Forms.Label();
             this.textBox_Rang = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.radioButton_FormatVertical = new System.Windows.Forms.RadioButton();
-            this.radioButton_FormatHorizontal = new System.Windows.Forms.RadioButton();
             this.button_saveData = new System.Windows.Forms.Button();
             this.groupBox_Equation.SuspendLayout();
-            this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // textBox_Equation
@@ -67,8 +59,7 @@
             this.textBox_Equation.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox_Equation.Size = new System.Drawing.Size(536, 168);
             this.textBox_Equation.TabIndex = 1;
-            this.textBox_Equation.Text = "h(h(g(g(z,z),g(z,z)),g(f,g(z,u))),h(g(k,g(u,u)),g(n,g(u,g(z,g(z,z))))))<m\r\nm<h(h(" +
-    "g(g(z,z),g(z,z)),g(f,g(z,u))),h(g(k,g(u,u)),g(n,g(u,g(z,g(z,z))))))";
+            this.textBox_Equation.Text = "g(h(z,c),s(c))<g(c,z)";
             // 
             // label_leftSideEquation
             // 
@@ -99,20 +90,20 @@
             this.textBox_resualEquation.Name = "textBox_resualEquation";
             this.textBox_resualEquation.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.textBox_resualEquation.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_resualEquation.Size = new System.Drawing.Size(622, 353);
+            this.textBox_resualEquation.Size = new System.Drawing.Size(622, 442);
             this.textBox_resualEquation.TabIndex = 5;
             this.textBox_resualEquation.WordWrap = false;
             // 
             // button_getResualtEquation
             // 
             this.button_getResualtEquation.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.button_getResualtEquation.Location = new System.Drawing.Point(573, 451);
+            this.button_getResualtEquation.Location = new System.Drawing.Point(12, 442);
             this.button_getResualtEquation.Name = "button_getResualtEquation";
             this.button_getResualtEquation.Size = new System.Drawing.Size(171, 67);
             this.button_getResualtEquation.TabIndex = 6;
             this.button_getResualtEquation.Text = "Решение";
             this.button_getResualtEquation.UseVisualStyleBackColor = true;
-            this.button_getResualtEquation.Click += new System.EventHandler(this.button_getResualtEquation_Click);
+            this.button_getResualtEquation.Click += new System.EventHandler(this.Button_getResualtEquation_Click);
             // 
             // label_multiopearions
             // 
@@ -133,9 +124,7 @@
             this.textBox_Multioperations.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBox_Multioperations.Size = new System.Drawing.Size(536, 161);
             this.textBox_Multioperations.TabIndex = 8;
-            this.textBox_Multioperations.Text = "g=1,1,1,1,1,1,2,4,8,16,1,4,16,2,8,1,8,2,16,4,1,16,8,4,2\r\nh=1,2,4,8,16,2,4,8,16,1," +
-    "4,8,16,1,2,8,16,1,2,4,16,1,2,4,8\r\nf=4,4,4,4,4\r\nk=8,8,8,8,8\r\nn=16,16,16,16,16\r\nm=" +
-    "1,1,1,1,1";
+            this.textBox_Multioperations.Text = "h=1332\r\ns=21\r\ng=1002";
             this.textBox_Multioperations.WordWrap = false;
             // 
             // textBox_coefficients
@@ -146,6 +135,7 @@
             this.textBox_coefficients.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.textBox_coefficients.Size = new System.Drawing.Size(163, 31);
             this.textBox_coefficients.TabIndex = 9;
+            this.textBox_coefficients.Text = "c";
             // 
             // label_coefficients
             // 
@@ -164,7 +154,7 @@
             this.textBox_unknows.Name = "textBox_unknows";
             this.textBox_unknows.Size = new System.Drawing.Size(163, 31);
             this.textBox_unknows.TabIndex = 11;
-            this.textBox_unknows.Text = "z,u";
+            this.textBox_unknows.Text = "z";
             // 
             // label_unknows
             // 
@@ -195,31 +185,7 @@
             this.textBox_conditions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox_conditions.Size = new System.Drawing.Size(168, 161);
             this.textBox_conditions.TabIndex = 13;
-            // 
-            // radioButton_AM
-            // 
-            this.radioButton_AM.AutoSize = true;
-            this.radioButton_AM.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.radioButton_AM.Location = new System.Drawing.Point(6, 30);
-            this.radioButton_AM.Name = "radioButton_AM";
-            this.radioButton_AM.Size = new System.Drawing.Size(250, 29);
-            this.radioButton_AM.TabIndex = 15;
-            this.radioButton_AM.Text = "Аналитический метод";
-            this.radioButton_AM.UseVisualStyleBackColor = true;
-            this.radioButton_AM.Visible = false;
-            // 
-            // radioButton_NM
-            // 
-            this.radioButton_NM.AutoSize = true;
-            this.radioButton_NM.Checked = true;
-            this.radioButton_NM.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.radioButton_NM.Location = new System.Drawing.Point(281, 30);
-            this.radioButton_NM.Name = "radioButton_NM";
-            this.radioButton_NM.Size = new System.Drawing.Size(209, 29);
-            this.radioButton_NM.TabIndex = 16;
-            this.radioButton_NM.TabStop = true;
-            this.radioButton_NM.Text = "Численный метод";
-            this.radioButton_NM.UseVisualStyleBackColor = true;
+            this.textBox_conditions.Text = "!=|a,b";
             // 
             // groupBox_Equation
             // 
@@ -258,24 +224,10 @@
             this.textBox_Rang.Name = "textBox_Rang";
             this.textBox_Rang.Size = new System.Drawing.Size(53, 31);
             this.textBox_Rang.TabIndex = 15;
-            this.textBox_Rang.Text = "5";
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.radioButton_AM);
-            this.groupBox1.Controls.Add(this.radioButton_NM);
-            this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.groupBox1.Location = new System.Drawing.Point(12, 442);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(542, 77);
-            this.groupBox1.TabIndex = 18;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Методы решения";
+            this.textBox_Rang.Text = "2";
             // 
             // groupBox2
             // 
-            this.groupBox2.Controls.Add(this.button_saveData);
-            this.groupBox2.Controls.Add(this.groupBox3);
             this.groupBox2.Controls.Add(this.textBox_resualEquation);
             this.groupBox2.Controls.Add(this.label_resultEquation);
             this.groupBox2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -286,56 +238,24 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Решение программы";
             // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.radioButton_FormatVertical);
-            this.groupBox3.Controls.Add(this.radioButton_FormatHorizontal);
-            this.groupBox3.Location = new System.Drawing.Point(6, 414);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(417, 86);
-            this.groupBox3.TabIndex = 6;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Формат вывода";
-            // 
-            // radioButton_FormatVertical
-            // 
-            this.radioButton_FormatVertical.AutoSize = true;
-            this.radioButton_FormatVertical.Location = new System.Drawing.Point(212, 37);
-            this.radioButton_FormatVertical.Name = "radioButton_FormatVertical";
-            this.radioButton_FormatVertical.Size = new System.Drawing.Size(160, 29);
-            this.radioButton_FormatVertical.TabIndex = 1;
-            this.radioButton_FormatVertical.Text = "Вертикально";
-            this.radioButton_FormatVertical.UseVisualStyleBackColor = true;
-            // 
-            // radioButton_FormatHorizontal
-            // 
-            this.radioButton_FormatHorizontal.AutoSize = true;
-            this.radioButton_FormatHorizontal.Checked = true;
-            this.radioButton_FormatHorizontal.Location = new System.Drawing.Point(6, 39);
-            this.radioButton_FormatHorizontal.Name = "radioButton_FormatHorizontal";
-            this.radioButton_FormatHorizontal.Size = new System.Drawing.Size(182, 29);
-            this.radioButton_FormatHorizontal.TabIndex = 0;
-            this.radioButton_FormatHorizontal.TabStop = true;
-            this.radioButton_FormatHorizontal.Text = "Горизонтально";
-            this.radioButton_FormatHorizontal.UseVisualStyleBackColor = true;
-            // 
             // button_saveData
             // 
-            this.button_saveData.Location = new System.Drawing.Point(429, 430);
+            this.button_saveData.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.button_saveData.Location = new System.Drawing.Point(545, 439);
             this.button_saveData.Name = "button_saveData";
             this.button_saveData.Size = new System.Drawing.Size(199, 70);
             this.button_saveData.TabIndex = 20;
             this.button_saveData.Text = "Сохранить данные в файл";
             this.button_saveData.UseVisualStyleBackColor = true;
-            this.button_saveData.Click += new System.EventHandler(this.button_saveData_Click);
+            this.button_saveData.Click += new System.EventHandler(this.Button_saveData_Click);
             // 
             // Form_Input
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1403, 533);
+            this.Controls.Add(this.button_saveData);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox_Equation);
             this.Controls.Add(this.button_getResualtEquation);
             this.Name = "Form_Input";
@@ -343,12 +263,8 @@
             this.Load += new System.EventHandler(this.Form_SolvingOfSystemEquationOfTheoryMultioperations_Load);
             this.groupBox_Equation.ResumeLayout(false);
             this.groupBox_Equation.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -367,16 +283,10 @@
         private System.Windows.Forms.Label label_unknows;
         private System.Windows.Forms.Label label_conditions;
         private System.Windows.Forms.TextBox textBox_conditions;
-        private System.Windows.Forms.RadioButton radioButton_AM;
-        private System.Windows.Forms.RadioButton radioButton_NM;
         private System.Windows.Forms.GroupBox groupBox_Equation;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label Rang;
         private System.Windows.Forms.TextBox textBox_Rang;
-        private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.RadioButton radioButton_FormatVertical;
-        private System.Windows.Forms.RadioButton radioButton_FormatHorizontal;
         private System.Windows.Forms.Button button_saveData;
     }
 }

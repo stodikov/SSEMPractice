@@ -5,12 +5,12 @@ using System.Text;
 
 namespace SolutionSystemEquationMultioperations.helpers
 {
-    class parseMultioperations
+    class ParseMultioperations
     {
-        public int[][] parseMOtoVectors(int[] MO, int rang)
+        public int[][] ParseMOtoVectors(int[] MO, int rang)
         {
             int n = MO.Length;
-            int[][] codeForInt = getCodeForInt(rang);
+            int[][] codeForInt = GetCodeForInt(rang);
             int[][] codeRepresentation = new int[rang][];
 
             for (int r = 0; r < rang; r++)
@@ -26,10 +26,10 @@ namespace SolutionSystemEquationMultioperations.helpers
             return codeRepresentation;
         }
 
-        public string[][] parseMOtoVectorsEquation(int[] MO, int rang)
+        public string[][] ParseMOtoVectorsEquation(int[] MO, int rang)
         {
             int n = MO.Length;
-            int[][] codeForInt = getCodeForInt(rang);
+            int[][] codeForInt = GetCodeForInt(rang);
             string[][] codeRepresentation = new string[rang][];
 
             for (int r = 0; r < rang; r++)
@@ -45,7 +45,7 @@ namespace SolutionSystemEquationMultioperations.helpers
             return codeRepresentation;
         }
 
-        public int[][] getCodeForInt(int rang)
+        public int[][] GetCodeForInt(int rang)
         {
             int logicElements = (int)Math.Pow(2, rang);
             int[][] codeForInt = new int[logicElements][];

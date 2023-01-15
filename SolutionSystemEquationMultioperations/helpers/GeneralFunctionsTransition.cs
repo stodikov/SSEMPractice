@@ -10,7 +10,7 @@ namespace SolutionSystemEquationMultioperations.helpers
     {
         GeneralFunctionsBF general = new GeneralFunctionsBF();
 
-        public void getEquationPresent(int rang, Dictionary<string, Multioperation> multioperations, string key)
+        public void GetEquationPresent(int rang, Dictionary<string, Multioperation> multioperations, string key)
         {
             string[] coefficients = multioperations[key].coefficients;
             string[][] newEquationPresent = new string[multioperations[key].codeRepresentation.Length][];

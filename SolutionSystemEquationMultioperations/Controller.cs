@@ -10,12 +10,11 @@ namespace SolutionSystemEquationMultioperations
         PrepairingData data = new PrepairingData();
         Transition transition = new Transition();
         methods.NumericalMethod NM = new methods.NumericalMethod();
-        methods.AnalyticalMethod AM = new methods.AnalyticalMethod();
 
-        public Dictionary<string, string[][]> Start(string rang, string equation, string multioperation, string coefficients, string unknowns, string conditions, bool method)
+        public Dictionary<string, string[][]> Start(string rang, string equation, string multioperation, string coefficients, string unknowns, string conditions)
         {
             Dictionary<string, string[][]> result = new Dictionary<string, string[][]>();
-            data.PreparingData(rang, equation, multioperation, coefficients, unknowns, conditions, method);
+            data.PreparingData(rang, equation, multioperation, coefficients, unknowns, conditions);
 
             if (data.error != "")
             {
@@ -23,49 +22,17 @@ namespace SolutionSystemEquationMultioperations
                 return result;
             }
 
-            string[][] systemEquation = transition.getSystemEquation(data.rang, data.equations, data.multioperations);
+            string[] systemEquation = transition.GetSystemEquation(data.rang, data.equations, data.multioperations);
+            Dictionary<string, string[][]> solution;
 
+            //?? Если неизвестных несколько, то как их искать?
 
-            switch (data.method)
-            {
-                //case "analytical":
-                //    if (conditionsInput.Length == 1 && conditionsInput[0] == "") return AM.getSolution(systemEquation, coefficients, unknowns);
-                //    else return AM.getSolution(systemEquation, coefficients, unknowns, conditionsInput);
-                case "numeric":
-                    if (data.conditions == null) return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns);
-                    else return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns, data.conditions);
-                default:
-                    if (data.conditions == null) return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns);
-                    else return NM.getSolution(data.rang, systemEquation, data.coefficients, data.unknowns, data.conditions);
-            }
+            if (data.conditions == null) solution = NM.GetSolution(data.rang, systemEquation, data.coefficients, data.unknowns);
+            else solution = NM.GetSolution(data.rang, systemEquation, data.coefficients, data.unknowns, data.conditions);
+
+            return solution;
+            //??
+            //return transition.SolutionInMultioperations(solution, data.rang);
         }
-
-        //public Dictionary<string, string[][]> start(int rang, Dictionary<string, Multioperation> multioperations, string[] conditionsInput, string[] equations, string coefficients, string unknowns, string method)
-        //{
-        //    int rowSystem = 0;
-        //    string[][] systemEquation = new string[rang * equations.Length][];
-        //    foreach(string equation in equations)
-        //    {
-        //        string[][] system = MOtoSEBF.transformation(rang, multioperations, equation);
-        //        for (int i = 0; i < system.Length; i++)
-        //        {
-        //            systemEquation[rowSystem] = system[i];
-        //            rowSystem++;
-        //        }
-        //    }
-            
-        //    switch (method)
-        //    {
-        //        //case "analytical":
-        //        //    if (conditionsInput.Length == 1 && conditionsInput[0] == "") return AM.getSolution(systemEquation, coefficients, unknowns);
-        //        //    else return AM.getSolution(systemEquation, coefficients, unknowns, conditionsInput);
-        //        case "numeric":
-        //            if (conditionsInput.Length == 1 && conditionsInput[0] == "") return NM.getSolution(rang, systemEquation, coefficients, unknowns);
-        //            else return NM.getSolution(rang, systemEquation, coefficients, unknowns, conditionsInput);
-        //        default:
-        //            if (conditionsInput.Length == 1 && conditionsInput[0] == "") return NM.getSolution(rang, systemEquation, coefficients, unknowns);
-        //            else return NM.getSolution(rang, systemEquation, coefficients, unknowns, conditionsInput);
-        //    }
-        //}
     }
 }

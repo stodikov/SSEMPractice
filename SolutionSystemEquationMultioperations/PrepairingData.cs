@@ -35,7 +35,7 @@ namespace SolutionSystemEquationMultioperations
             else multioperations.Clear();
         }
 
-        public void PreparingData(string rang, string equation, string multioperations, string coefficients, string unknowns, string conditions, bool method)
+        public void PreparingData(string rang, string equation, string multioperations, string coefficients, string unknowns, string conditions)
         {
             ClearData();
             //Проверка ранга
@@ -54,8 +54,6 @@ namespace SolutionSystemEquationMultioperations
             //Проверка уравнения
             ValidateEquation(equation.Replace("\r", "").Split('\n'), vectorsMultioperations);
             if (error != "") return;
-
-            this.method = method ? "numeric" : "analitycal";
         }
 
         private void ValidateRang(string rang)
@@ -115,8 +113,8 @@ namespace SolutionSystemEquationMultioperations
                 string[][] newEquation = new string[rang][];
                 for (int i = 0; i < rang; i++)
                 {
-                    newEquation[i] = new string[] { $"{coefficient}{i + 1}" };
-                    coefficientsOfEquation += $"{coefficient}{i + 1},";
+                    newEquation[i] = new string[] { $"{coefficient}_{i + 1}" };
+                    coefficientsOfEquation += $"{coefficient}_{i + 1},";
                 }
                 if (elementsOfEquation.ContainsKey(coefficient)) error = $"Обозначение коэффициента {coefficient} уже используется|";
                 else elementsOfEquation.Add(coefficient, 1);
@@ -134,8 +132,8 @@ namespace SolutionSystemEquationMultioperations
                 string[][] newEquation = new string[rang][];
                 for (int i = 0; i < rang; i++)
                 {
-                    newEquation[i] = new string[] { $"{unknown}{i + 1}" };
-                    unknownsOfEquation += $"{unknown}{i + 1},";
+                    newEquation[i] = new string[] { $"{unknown}_{i + 1}" };
+                    unknownsOfEquation += $"{unknown}_{i + 1},";
                 }
                 if (elementsOfEquation.ContainsKey(unknown)) error = $"Обозначение неизвестной {unknown} уже используется|";
                 else elementsOfEquation.Add(unknown, 1);
@@ -167,7 +165,7 @@ namespace SolutionSystemEquationMultioperations
             string[] decompositionEquation;
             string[] notConstantsArr;
             this.equations = new string[equations.Length];
-            helpers.parseMultioperations parse = new helpers.parseMultioperations();
+            helpers.ParseMultioperations parse = new helpers.ParseMultioperations();
 
             for (int i = 0; i < equations.Length; i++)
             {
@@ -191,7 +189,7 @@ namespace SolutionSystemEquationMultioperations
                             if (vectorsMultioperations[designationMultioperation].Length != Math.Pow(rang, arguments.Length)) error += $"Ошибка между соотношением переменных и векторной формы мультиоперации {designationMultioperation}|";
 
                             notConstants += designationMultioperation + ',';
-                            int[][] codeRepresentation = parse.parseMOtoVectors(vectorsMultioperations[designationMultioperation], rang);
+                            int[][] codeRepresentation = parse.ParseMOtoVectors(vectorsMultioperations[designationMultioperation], rang);
                             Multioperation newMO = new Multioperation(designationMultioperation, codeRepresentation, arguments, null);
                             multioperations.Add(designationDecomposition, newMO);
                         }
@@ -204,7 +202,7 @@ namespace SolutionSystemEquationMultioperations
             {
                 if (notConstantsArr.Contains(kvp.Key)) continue;
                 if (vectorsMultioperations[kvp.Key].Length != rang) error = $"Количество элементов в константе должно быть равно {rang}|";
-                string[][] equationPresent = parse.parseMOtoVectorsEquation(vectorsMultioperations[kvp.Key], rang);
+                string[][] equationPresent = parse.ParseMOtoVectorsEquation(vectorsMultioperations[kvp.Key], rang);
                 Multioperation newMO = new Multioperation(kvp.Key, null, null, equationPresent);
                 multioperations.Add(kvp.Key, newMO);
             }
