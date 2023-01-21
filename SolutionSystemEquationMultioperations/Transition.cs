@@ -77,19 +77,12 @@ namespace SolutionSystemEquationMultioperations
         //3? Проверка на no-conditions
         //4? Костыль - первый ключ идет unknowns
 
-        public Dictionary<string, string[][]> SolutionInMultioperations(Dictionary<string, string[][]> solutionBF, int rang)
+        public Dictionary<string, Dictionary<string, string[][]>> SolutionInMultioperations(Dictionary<string, Dictionary<string, string[][]>> solutionBF, int rang)
         {
-            if (solutionBF.ContainsKey("no-conditions")) return solutionBF;
-            Dictionary<string, string[][]> solutionMO = new Dictionary<string, string[][]>();
-            foreach (KeyValuePair<string, string[][]> kvp in solutionBF)
+            if (solutionBF.ContainsKey("no conditions") || solutionBF.ContainsKey("no solution")) return solutionBF;
+            Dictionary<string, Dictionary<string, string[][]>> solutionMO = new Dictionary<string, Dictionary<string, string[][]>>();
+            foreach (KeyValuePair<string, Dictionary<string, string[][]>> kvp in solutionBF)
             {
-                //??
-                if (kvp.Key == "unknows")
-                {
-                    solutionMO.Add(kvp.Key, kvp.Value);
-                    continue;
-                }
-                //?
                 string key = BuildKeyMultioperation(kvp.Key, rang);
                 solutionMO.Add(key, kvp.Value);
             }

@@ -11,28 +11,28 @@ namespace SolutionSystemEquationMultioperations
         Transition transition = new Transition();
         methods.NumericalMethod NM = new methods.NumericalMethod();
 
-        public Dictionary<string, string[][]> Start(string rang, string equation, string multioperation, string coefficients, string unknowns, string conditions)
+        public Dictionary<string, Dictionary<string, string[][]>> Start(string rang, string equation, string multioperation, string coefficients, string unknowns, string conditions)
         {
-            Dictionary<string, string[][]> result = new Dictionary<string, string[][]>();
+            Dictionary<string, Dictionary<string, string[][]>> result = new Dictionary<string, Dictionary<string, string[][]>>();
             data.PreparingData(rang, equation, multioperation, coefficients, unknowns, conditions);
 
             if (data.error != "")
             {
-                result.Add("error", new string[][] { new string[] { data.error } });
+                result.Add("error", new Dictionary<string, string[][]>() { { "error", new string[][] { new string[] { data.error } } } });
                 return result;
             }
 
             string[] systemEquation = transition.GetSystemEquation(data.rang, data.equations, data.multioperations);
-            Dictionary<string, string[][]> solution;
+            Dictionary<string, Dictionary<string, string[][]>> solution;
 
             //?? Если неизвестных несколько, то как их искать?
 
             if (data.conditions == null) solution = NM.GetSolution(data.rang, systemEquation, data.coefficients, data.unknowns);
             else solution = NM.GetSolution(data.rang, systemEquation, data.coefficients, data.unknowns, data.conditions);
 
-            return solution;
+            //return solution;
             //??
-            //return transition.SolutionInMultioperations(solution, data.rang);
+            return transition.SolutionInMultioperations(solution, data.rang);
         }
     }
 }

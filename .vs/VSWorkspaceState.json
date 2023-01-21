@@ -2,6 +2,7 @@
   "ExpandedNodes": [
     "",
     "\\SolutionSystemEquationMultioperations",
+    "\\SolutionSystemEquationMultioperations\\helpers",
     "\\SolutionSystemEquationMultioperations\\methods"
   ],
   "SelectedNode": "\\SolutionSystemEquationMultioperations\\methods\\NumericalMethod.cs",
