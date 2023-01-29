@@ -29,6 +29,9 @@ namespace SolutionSystemEquationMultioperations
             rang = 0;
             error = "";
             coefficients = "";
+            unknowns = "";
+            equations = new string[0];
+            conditions = new string[0];
             elementsOfEquation.Clear();
 
             if (multioperations == null) multioperations = new Dictionary<string, Multioperation>();

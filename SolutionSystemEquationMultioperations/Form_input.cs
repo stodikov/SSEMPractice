@@ -24,7 +24,7 @@ namespace SolutionSystemEquationMultioperations
         {
             char[] forTrim = new char[] { '\r', '\n', ' ' };
             textBox_resualEquation.Text = "Поиск решений...";
-            Dictionary<string, Dictionary<string, string[][]>> result = Controller.Start(
+            Dictionary<string, string[][]> result = Controller.Start(
                 textBox_Rang.Text,
                 textBox_Equation.Text.Trim(forTrim),
                 textBox_Multioperations.Text.Trim(forTrim),
@@ -34,12 +34,12 @@ namespace SolutionSystemEquationMultioperations
             OutputResult(result);
         }
 
-        private void OutputResult(Dictionary<string, Dictionary<string, string[][]>> result)
+        private void OutputResult(Dictionary<string, string[][]> result)
         {
             textBox_resualEquation.Text = "";
             if (result.ContainsKey("error"))
             {
-                string[] errors = result["error"]["error"][0][0].Split('|');
+                string[] errors = result["error"][0][0].Split('|');
                 foreach (string error in errors) textBox_resualEquation.Text += $"{error}\r\n";
                 return;
             }
@@ -51,35 +51,41 @@ namespace SolutionSystemEquationMultioperations
 
             int rang = Convert.ToInt32(textBox_Rang.Text);
 
-            foreach (KeyValuePair<string, Dictionary<string, string[][]>> kvpRes in result)
+            foreach (KeyValuePair<string, string[][]> kvpRes in result)
             {
                 string condition = kvpRes.Key;
-                Dictionary<string, string[][]> resCondition = kvpRes.Value;
+                string[][] resValue = kvpRes.Value;
                 string answer = "";
-                string[] answersUnknow = new string[] { "new" };
+                //Формирование неизвестных
+                string[] unknowns = textBox_unknows.Text.Split(',');
+                string[] unknownsArr = new string[unknowns.Length * rang];
+                int lenUnknownsArr = 0;
+                foreach (string unknow in unknowns)
+                {
+                    for (int i = 0; i < rang; i++)
+                    {
+                        unknownsArr[lenUnknownsArr] = $"{unknow}_{i + 1}";
+                        lenUnknownsArr++;
+                    }
+                }
+                //Формирование неизвестных
 
                 if (condition != "no conditions") answer += $"При {condition}";
                 answer = answer != "" ? answer.TrimEnd(new char[] { ' ', ',' }) + "\r\n" : "";
-                foreach (KeyValuePair<string, string[][]> kvp in resCondition)
+                for (int i = 0; i < unknownsArr.Length; i++)
                 {
-                    string unknow = kvp.Key;
-                    string[][] resValue = kvp.Value;
-                    if (answersUnknow[0] == "new") answersUnknow = new string[resValue.Length];
-                    //for (int i = 0; i < resValue.Length; i++)
-                    //{
-                    //    for (int r = 0; r < rang; r++)
-                    //    {
-                    //        answersUnknow[i] += $"{unknow}_{r} = {resValue[i][r]}   ";
-                    //    }
-                    //}
-
-                    for (int i = 0; i < resValue.Length; i++)
+                    for (int j = 0; j < resValue.Length; j++)
                     {
-                        for (int r = 0; r < rang; r++) answersUnknow[i] += $"{unknow}_{r} = {resValue[i][r]}\r\n";
+                        answer += $"{unknownsArr[i]} = {resValue[j][i]}   ";
                     }
+                    answer += "\r\n";
                 }
-                foreach (string strAnswer in answersUnknow) answer += $"{strAnswer}\r\n";
                 answer += "\r\n";
+                //for (int i = 0; i < resValue.Length; i++)
+                //{
+                //    for (int j = 0; j < unknownsArr.Length; j++) answer += $"{unknownsArr[j]} = {resValue[i][j]}\r\n";
+                //    answer += "\r\n";
+                //}
                 textBox_resualEquation.Text += answer;
             }
         }

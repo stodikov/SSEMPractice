@@ -9,15 +9,14 @@ namespace SolutionSystemEquationMultioperations.methods
     class NumericalMethod
     {
         Dictionary<string, int> keysArguments = new Dictionary<string, int>();
-        Dictionary<string, Dictionary<string, List<string[]>>> setsForResult = new Dictionary<string, Dictionary<string, List<string[]>>>();
-        Dictionary<string, Dictionary<string, string[][]>> solution = new Dictionary<string, Dictionary<string, string[][]>>();
+        Dictionary<string, List<string[]>> setsForResult = new Dictionary<string, List<string[]>>();
+        Dictionary<string, string[][]> solution = new Dictionary<string, string[][]>();
         string argumentsConditions = "";
 
-        public Dictionary<string, Dictionary<string, string[][]>> GetSolution(int rang, string[] equation, string coefficients, string unknowns, string[] conditionsInput = null)
+        public Dictionary<string, string[][]> GetSolution(int rang, string[] equation, string coefficients, string unknowns, string[] conditionsInput = null)
         {
             string[] coefficientsArr = coefficients == "" ? new string[0] : coefficients.Split(',');
             string[] unknownsArr = unknowns.Split(',');
-            Dictionary<string, string[]> structuringUnknows = StructuringUnknowns(unknownsArr, rang);
 
             keysArguments.Clear();
             setsForResult.Clear();
@@ -33,24 +32,11 @@ namespace SolutionSystemEquationMultioperations.methods
             string[] argumentsConditionsArr = argumentsConditions.Trim(',').Split(',');
             argumentsConditions = DeleteUnknowsFromArgumentCondition(argumentsConditionsArr, unknownsArr);
 
-            SetsForResult(equation, unknownsArr, structuringUnknows, rang);
-            if (setsForResult.Keys.Count != 0) GetResultEquation(rang, structuringUnknows);
-            else solution.Add("no solution", new Dictionary<string, string[][]>());
+            SetsForResult(equation, coefficientsArr, unknownsArr);
+            if (setsForResult.Keys.Count != 0) GetResultEquation(rang, unknownsArr);
+            else solution.Add("no solution", new string[][] { new string[] { "no solution" } });
 
             return solution;
-        }
-
-        private Dictionary<string, string[]> StructuringUnknowns(string[] unknownsArr, int rang)
-        {
-            Dictionary<string, string[]> structuringUnknows = new Dictionary<string, string[]>();
-            foreach (string unknown in unknownsArr)
-            {
-                string key = unknown.Split('_')[0];
-                int index = Convert.ToInt32(unknown.Split('_')[1]) - 1;
-                if (!structuringUnknows.ContainsKey(key)) structuringUnknows.Add(key, new string[rang]);
-                structuringUnknows[key][index] = unknown;
-            }
-            return structuringUnknows;
         }
 
         private string[] AddConditionsToEquation(string[] equation, string[] conditionsInput)
@@ -103,14 +89,14 @@ namespace SolutionSystemEquationMultioperations.methods
             return equationConditions;
         }
 
-        private void SetsForResult(
-            string[] equation,
-            string[] unknownsArr,
-            Dictionary<string, string[]> structuringUnknowns,
-            int rang)
+        /*
+         * Неправильно формируются пары
+         * */
+
+        private void SetsForResult(string[] equation, string[] coefficientsArr, string[] unknownsArr)
         {
             int truthLimit = (int)Math.Pow(2, keysArguments.Count);
-            int setsLimit = (int)Math.Pow(2, unknownsArr.Length);
+            int setsLimit = (int)Math.Pow(2, unknownsArr.Length); //? А если условий нет?
             int currentSetLimit = 0;
             string currentRes = "";
             for (int i = 0; i < truthLimit; i++)
@@ -131,7 +117,7 @@ namespace SolutionSystemEquationMultioperations.methods
                 if (currentSetLimit == setsLimit)
                 {
                     currentSetLimit = 0;
-                    if (!(currentRes == "")) AddSets(currentRes.TrimEnd(',').Split(','), unknownsArr, structuringUnknowns, rang);
+                    if (!(currentRes == "")) AddSets(currentRes.TrimEnd(',').Split(','), coefficientsArr, unknownsArr);
                     currentRes = "";
                 }
             }
@@ -195,42 +181,31 @@ namespace SolutionSystemEquationMultioperations.methods
             return res;
         }
 
-        private void AddSets(string[] currentRes, string[] unknowsArr, Dictionary<string, string[]> structuringUnknowns, int rang)
+        private void AddSets(string[] currentRes, string[] coefficientsArr, string[] unknowsArr)
         {
             string key = "";
-            if (argumentsConditions == "") key = "no conditions";
-            else key = BuildKey(currentRes[0]);
+            if (argumentsConditions == "" && keysArguments.Count == unknowsArr.Length) key = "no conditions"; //1 Все неизвестные - no conditions (Если есть условие с неизвестными - они будут отражены в ответе)
+            else if (argumentsConditions != "" && keysArguments.Count != unknowsArr.Length) key = BuildKeyOnCondition(currentRes[0]); //2 Есть коэфициенты и условия на них - ключ по условию на коэфициента
+            else key = BuildKeyOnCoefficients(currentRes[0], coefficientsArr); //3 Есть коэфициенты, но нет условий - ключ по коэфициентам
 
-            if (!setsForResult.ContainsKey(key)) setsForResult.Add(key, new Dictionary<string, List<string[]>>());
-            BuildSetsFromUnknowns(currentRes, structuringUnknowns, rang, setsForResult[key]);
-
+            if (!setsForResult.ContainsKey(key)) setsForResult.Add(key, new List<string[]>());
+            setsForResult[key].Add(BuildSet(currentRes, unknowsArr));
         }
 
-        private void BuildSetsFromUnknowns(
-            string[] currentRes,
-            Dictionary<string, string[]> structuringUnknowns,
-            int rang,
-            Dictionary<string, List<string[]>> sets
-            )
+        private string[] BuildSet(string[] currentRes, string[] unknowns)
         {
-            foreach(KeyValuePair<string, string[]> kvp in structuringUnknowns)
+            string[] res = new string[currentRes.Length];
+            for (int i = 0; i < currentRes.Length; i++)
             {
-                string[] res = new string[currentRes.Length];
-                string key = kvp.Key;
-                for (int i = 0; i < currentRes.Length; i++)
+                foreach (string unknow in unknowns)
                 {
-                    string[] unknows = kvp.Value;
-                    foreach (string unknow in unknows)
-                    {
-                        res[i] += currentRes[i][keysArguments[unknow]];
-                    }
+                    res[i] += currentRes[i][keysArguments[unknow]];
                 }
-                if (!sets.ContainsKey(key)) sets.Add(key, new List<string[]>());
-                sets[key].Add(res);
             }
+            return res;
         }
 
-        private string BuildKey(string elem)
+        private string BuildKeyOnCondition(string elem)
         {
             string key = "";
             foreach (string argument in argumentsConditions.Split(','))
@@ -240,23 +215,31 @@ namespace SolutionSystemEquationMultioperations.methods
             return key.TrimEnd(',');
         }
 
-        private void GetResultEquation(int rang, Dictionary<string, string[]> structuringUnknows)
+        private string BuildKeyOnCoefficients(string elem, string[] coefficientsArr)
+        {
+            string key = "";
+            foreach (string coefficient in coefficientsArr)
+            {
+                key += $"{coefficient}={elem[keysArguments[coefficient]]},";
+            }
+            return key.TrimEnd(',');
+        }
+
+        private void GetResultEquation(int rang, string[] unknowns)
         {
             foreach (string condition in setsForResult.Keys)
             {
-                Dictionary<string, string[][]> resultForCondition = new Dictionary<string, string[][]>();
-                foreach (string unknown in setsForResult[condition].Keys)
-                {
-                    string[][] resultOnSet = GetResultOnSets(rang, setsForResult[condition][unknown], structuringUnknows[unknown]);
-                    resultForCondition.Add(unknown, resultOnSet);
-
-                }
-                solution.Add(condition, resultForCondition);
+                string[][] resultOnSet = GetResultOnSets(rang, setsForResult[condition], unknowns);
+                solution.Add(condition, resultOnSet);
             }
         }
 
         private string[][] GetResultOnSets(int rang, List<string[]> sets, string[] unknowns)
         {
+            //sets.Clear();
+            //sets.Add(new string[] { "0111", "1000" });
+            //sets.Add(new string[] { "0010", "0110", "0111" });
+            //sets.Add(new string[] { "1111" });
             int countResSets = sets[0].Length, slice = 0, count = 0;
             string[][] result;
 
@@ -266,7 +249,7 @@ namespace SolutionSystemEquationMultioperations.methods
                 for (int i = 0; i < result.Length; i++) result[i] = new string[unknowns.Length];
                 for (int i = 0; i < sets[0].Length; i++)
                 {
-                    for (int r = 0; r < rang; r++) result[count][r] += sets[0][i][r];
+                    for (int u = 0; u < unknowns.Length; u++) result[count][u] += sets[0][i][u];
                     count++;
                 }
             }
