@@ -1,10 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\SolutionSystemEquationMultioperations",
-    "\\SolutionSystemEquationMultioperations\\helpers",
-    "\\SolutionSystemEquationMultioperations\\methods"
+    "\\SolutionSystemEquationMultioperations"
   ],
-  "SelectedNode": "\\SolutionSystemEquationMultioperations\\methods\\NumericalMethod.cs",
+  "SelectedNode": "\\SolutionSystemEquationMultioperations\\Instruction.cs",
   "PreviewInSolutionExplorer": false
 }

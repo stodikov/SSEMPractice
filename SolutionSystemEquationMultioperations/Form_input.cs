@@ -23,7 +23,6 @@ namespace SolutionSystemEquationMultioperations
         private void Button_getResualtEquation_Click(object sender, EventArgs e)
         {
             char[] forTrim = new char[] { '\r', '\n', ' ' };
-            textBox_resualEquation.Text = "Поиск решений...";
             Dictionary<string, string[][]> result = Controller.Start(
                 textBox_Rang.Text,
                 textBox_Equation.Text.Trim(forTrim),
@@ -53,12 +52,13 @@ namespace SolutionSystemEquationMultioperations
 
             foreach (KeyValuePair<string, string[][]> kvpRes in result)
             {
-                string condition = kvpRes.Key;
+                string[] elementsCondition = kvpRes.Key.Split(',');
                 string[][] resValue = kvpRes.Value;
-                string answer = "";
+                string answer = "", condition = "";
                 //Формирование неизвестных
                 string[] unknowns = textBox_unknows.Text.Split(',');
                 string[] unknownsArr = new string[unknowns.Length * rang];
+                char[] trimElem = new char[] { ' ', ',' };
                 int lenUnknownsArr = 0;
                 foreach (string unknow in unknowns)
                 {
@@ -70,40 +70,143 @@ namespace SolutionSystemEquationMultioperations
                 }
                 //Формирование неизвестных
 
-                if (condition != "no conditions") answer += $"При {condition}";
-                answer = answer != "" ? answer.TrimEnd(new char[] { ' ', ',' }) + "\r\n" : "";
-                for (int i = 0; i < unknownsArr.Length; i++)
+                if (elementsCondition[0] != "no conditions")
                 {
-                    for (int j = 0; j < resValue.Length; j++)
+                    foreach (string elem in elementsCondition)
                     {
-                        answer += $"{unknownsArr[i]} = {resValue[j][i]}   ";
+                        string[] split = elem.Split('=');
+                        condition += $"{split[0]} = {split[1]}, ";
+                    }
+                    condition = condition.TrimEnd(trimElem);
+                    answer += $"При {condition}";
+                }
+                answer = answer != "" ? answer.TrimEnd(trimElem) + "\r\n" : "";
+                if (radioButton_horizontalFormat.Checked)
+                {
+                    for (int i = 0; i < unknownsArr.Length; i++)
+                    {
+                        for (int j = 0; j < resValue.Length; j++)
+                        {
+                            answer += $"{unknownsArr[i]} = {resValue[j][i]}   ";
+                        }
+                        answer += "\r\n";
                     }
                     answer += "\r\n";
                 }
-                answer += "\r\n";
-                //for (int i = 0; i < resValue.Length; i++)
-                //{
-                //    for (int j = 0; j < unknownsArr.Length; j++) answer += $"{unknownsArr[j]} = {resValue[i][j]}\r\n";
-                //    answer += "\r\n";
-                //}
+                else
+                {
+                    for (int i = 0; i < resValue.Length; i++)
+                    {
+                        for (int j = 0; j < unknownsArr.Length; j++) answer += $"{unknownsArr[j]} = {resValue[i][j]}\r\n";
+                        answer += "\r\n";
+                    }
+                }
                 textBox_resualEquation.Text += answer;
             }
         }
 
         private void Button_saveData_Click(object sender, EventArgs e)
         {
+            string nameFile = textBox_nameFileSave.Text.Trim();
+            if (!checkNameFile(nameFile, textBox_nameFileSave)) return;
             char[] forTrim = new char[] { '\r', '\n', ' ' };
-            string saveData = $"Ранг:\r\n{textBox_Rang.Text}\r\n" +
-                              $"Уравнение:\r\n{textBox_Equation.Text.Trim(forTrim)}\r\n" +
-                              $"Мультиоперации:\r\n{textBox_Multioperations.Text.Trim(forTrim)}\r\n" +
-                              $"Коэффициенты:\r\n{textBox_coefficients.Text.Trim(forTrim)}\r\n" +
-                              $"Неизвестные:\r\n{textBox_unknows.Text.Trim(forTrim)}\r\n" +
-                              $"Условия:\r\n{textBox_conditions.Text.Trim(forTrim)}\r\n" +
-                              $"Результат:\r\n{textBox_resualEquation.Text.Trim(forTrim)}";
-            string curPath = Environment.CurrentDirectory;
-            StreamWriter sw = new StreamWriter(@"C:\Users\NiceLiker\Desktop\SSIM\Data.txt");
+            string saveData = $"Ранг\r\n{textBox_Rang.Text}\r\n" +
+                              $"Уравнение\r\n{textBox_Equation.Text.Trim(forTrim)}\r\n" +
+                              $"Мультиоперации\r\n{textBox_Multioperations.Text.Trim(forTrim)}\r\n" +
+                              $"Коэффициенты\r\n{textBox_coefficients.Text.Trim(forTrim)}\r\n" +
+                              $"Неизвестные\r\n{textBox_unknows.Text.Trim(forTrim)}\r\n" +
+                              $"Условия\r\n{textBox_conditions.Text.Trim(forTrim)}\r\n" +
+                              $"Результат\r\n{textBox_resualEquation.Text.Trim(forTrim)}";
+            string curPath = Application.StartupPath;
+            StreamWriter sw = new StreamWriter($@"{curPath}\{nameFile}.txt");
             sw.Write(saveData);
             sw.Close();
+        }
+
+        private void button_uploadData_Click(object sender, EventArgs e)
+        {
+            string nameFile = textBox_nameFileUpload.Text.Trim();
+            if (!checkNameFile(nameFile, textBox_nameFileUpload)) return;
+            string curPath = Application.StartupPath,
+                   line = "";
+            string[] points = new string[] { "ранг", "уравнение", "мультиоперации", "коэффициенты", "неизвестные", "условия", "результат" };
+            int countPoints = 0;
+
+            try
+            {
+                StreamReader sr = new StreamReader($@"{curPath}\{nameFile}.txt");
+                clearForm();
+
+                while ((line = sr.ReadLine()) != null)
+                {
+                    if (countPoints < points.Length && line.ToLower() == points[countPoints]) countPoints++;
+                    else insertData(countPoints, line.Trim());
+                }
+            }
+            catch
+            {
+                textBox_nameFileUpload.Text = "Файл не найден";
+            }
+        }
+
+        private void clearForm()
+        {
+            textBox_Rang.Text = "";
+            textBox_Equation.Text = "";
+            textBox_Multioperations.Text = "";
+            textBox_coefficients.Text = "";
+            textBox_unknows.Text = "";
+            textBox_conditions.Text = "";
+            textBox_resualEquation.Text = "";
+        }
+
+        private void insertData(int countPoint, string line)
+        {
+            switch (countPoint)
+            {
+                case 1:
+                    textBox_Rang.Text = line;
+                    break;
+                case 2:
+                    textBox_Equation.Text += $"{line}\r\n";
+                    break;
+                case 3:
+                    textBox_Multioperations.Text += $"{line}\r\n";
+                    break;
+                case 4:
+                    textBox_coefficients.Text = line;
+                    break;
+                case 5:
+                    textBox_unknows.Text = line;
+                    break;
+                case 6:
+                    textBox_conditions.Text = $"{line}\r\n";
+                    break;
+                case 7:
+                    textBox_resualEquation.Text += $"{line}\r\n";
+                    break;
+            }
+        }
+
+        private void button_longInstruction_Click(object sender, EventArgs e)
+        {
+            Instruction instruction = new Instruction();
+            instruction.Show();
+        }
+
+        private bool checkNameFile(string nameFile, TextBox textBox)
+        {
+            if (nameFile == "" || nameFile == "Не указано название файла")
+            {
+                textBox.Text = "Не указано название файла";
+                return false;
+            }
+            else if (nameFile.Split(' ').Length > 1)
+            {
+                textBox.Text = "Пробелы в название файла";
+                return false;
+            }
+            return true;
         }
     }
 }

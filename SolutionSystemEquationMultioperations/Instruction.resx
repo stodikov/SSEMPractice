@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="label26.Text" xml:space="preserve">
+    <value>Идея работы основана на алгоритме, который описан в статье 1. Для решения систем неравенств в булевых функциях используется численный метод
+
+При открытии главного окна вы увидите следующие поля:
+
+Уравнение - поле, куда вы вводите систему включений на языке мультиопераций. Поле может принимать любое количество включений.
+Каждое новое включение вводится на новой строке (enter). Знак включения обозначается символом "&lt;"
+Для поле предусмотрена проверка на лишние символы и пробелы, но рекомендуется проверять то что вы вводите.
+Также рекомендуется вводить все без пробелов.
+
+Мультиоперации - поле, куда вы вводите мультиоперации. Каждая новая мультиоперация вводится на новой строке (enter)
+Если ранг меньше 4, то вектор мультиоперации можно задавать в виде h=1332.
+Если ранга равен 4 или больше, то вектор мультиопераций можно задавать через пробелы h=10 15 8 4, или через запятые h=10,15,8,4
+Для поля предусмотрена проверка на ошибки, но рекомендуется проверять то, что вы вводите.
+Также рекомендуется вводить все без пробелов.
+
+Ранг - ранг, в котором вы решаете систему включений
+
+Коэффициенты - коэффициенты в вашей системе включений (системах включений). В ответе сообщается при каких коэффициентах имеется решение.
+
+Неизвестные - неизвестные в вашей системе включений (системах включений). В ответе сообщается чему равны неизвестные.
+
+Условия - поле, в котором вы вводите условия при которых рассматривается система включений. Каждое новое условие вводится на новой строке (enter).
+В настоящий момент поле является не завершенным. На текущий момент предусмотрено только одно условие: неравно (!=).
+Условие задается через матричные переменные.
+Пример: если нам необходимо, чтобы x_1 и x_2 не были равны, но сюда мы записываем следующее выражение: !=|x_1,x_2
+В операнде != можно указывать только 2 матричные переменные. Если вы укажете !=|x_1,x_2,x_3 - это приведет к ошибке.
+Вы можете задать сколько угодно условий. Можно использовать коэффициенты и неизвестные.
+В условиях можно перекрещивать матричные переменные коэффициентов и неизвестных.
+
+Результат - поле, в которое выводится результат программы.
+В настоящий момент поле является не завершенным. Ответ выдается в матричных переменных
+На текущий момент возможны два варианта ответа:
+1) Для каждой матричной переменной выводится одно значение - 0 или 1.
+2) Для каждой матричной переменной выводится вектор.
+Если ответ получен по первому варианту, то его можно проверить путем перевода полученной матрицы в логическое значение на языке мультиопераций
+Если ответ получен по второму варианту, то необходимо вектор перевести на язык мультиопераций и привести к любой форме
+(можно использовать стандартную нормальную формы или ключевую стандартну нормальную форму)
+
+Кнопки:
+Решение - поиск решения
+Сохранить данные в файл - сохранение данных в файл
+Загрузить данные из файла - загрузка данных из файла
+Подробная инструкция - открытие окна с подробной инструкцей
+Короткая инструкция - открытие окна с короткой инструкцией
+
+Радио-кнопки: (для удобства)
+Вертикально - вертикальный формат ответа
+Горизонтально - горизонтальный формат ответа</value>
+  </data>
+  <data name="label33.Text" xml:space="preserve">
+    <value>Так как программа еще не является завершеной, часть входных и выходных данных представляются с помощью кодировки.
+Пример: при ранге 2 рассмотрим некую переменную, которую обозначим как "x". Переменная "х" может принимать любое значение из множества {0,1,2,3}.</value>
+  </data>
+  <data name="label35.Text" xml:space="preserve">
+    <value>Такой подход позволяет представлять мультиоперации в виде k булевых векторов. Каждый вектор соотносится с логическим элементом.
+При ранге 2 мы рассматриваем логические элементы из множества {1,2}. Первая строка (1 1 1 0) соотностится с 1, вторая строка (0 1 1 1) соотносится с 2.</value>
+  </data>
+  <data name="label3.Text" xml:space="preserve">
+    <value>Для того, чтобы загрузить или сохранить данные, в поле над кнопкой необходимо ввести название файла.
+Если названия не будет, выведится ошибка. Также в название файлов не должно быть пробелов.
+Файлы автоматически создаются в формате txt.
+Для более удобной работы рекомендуется создать папку и поместить в нее exe файл.
+Все файлы будут храниться в этой же папке.</value>
+  </data>
+  <data name="label5.Text" xml:space="preserve">
+    <value>В комплексе реализован модуль для проверки входных данных.
+Все входные данные валидируются и если где-то допущена ошибка, в поле "результат" будет выведена ошибка с пояснением.
+Так как в комплекс является не завершенным, то имеется вероятность что не все ошибки учтены.
+Также рекомендуется ввод данных без пробелов.</value>
+  </data>
+  <data name="label6.Text" xml:space="preserve">
+    <value>При открытии вы увидите, что во всех полях, кроме "результат" уже подставлены входные данные.
+Это показательный пример, по которому вы сможете увидеть в каком формате должны вводиться входные данные.
+Этот же пример записан файл example.txt. В этом файле показан формат хранения данных в файле.
+
+Также у вас имеется файл meshaninov-example, где рассматривается пример при ранге 5.
+
+
+</value>
+  </data>
+</root>
