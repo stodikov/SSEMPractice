@@ -38,9 +38,9 @@ namespace SolutionSystemEquationMultioperations
             if (data.conditions == null) solution = NM.GetSolution(data.rang, systemEquation, data.coefficients, data.unknowns);
             else solution = NM.GetSolution(data.rang, systemEquation, data.coefficients, data.unknowns, data.conditions);
 
-            return solution;
+            //return solution;
             //??
-            //return transition.SolutionInMultioperations(solution, data.rang);
+            return transition.SolutionInMultioperations(solution, data.rang);
         }
     }
 }

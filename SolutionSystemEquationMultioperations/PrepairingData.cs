@@ -74,7 +74,7 @@ namespace SolutionSystemEquationMultioperations
             {
                 int[] multioperation;
                 string[] input = s.Split('=');
-                if (input.Length != 2) error = $"Неправильно задача мультиоперация {input[0]}|";
+                if (input.Length != 2) error = $"Неправильно задана мультиоперация {input[0]}|";
 
                 if (rang < 4)
                 {

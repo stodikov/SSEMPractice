@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 
 namespace SolutionSystemEquationMultioperations
 {
@@ -72,19 +73,16 @@ namespace SolutionSystemEquationMultioperations
             }
         }
 
-        //1? Как быть если неизвестные состоят не из 0 и 1, а из векторов (z1 = 0011, z2 = 0101)
-        //2? Использовать не словари и массивы string, а уже созданный класс multioperation.cs?
-        //3? Проверка на no-conditions
-        //4? Костыль - первый ключ идет unknowns
-
         public Dictionary<string, string[][]> SolutionInMultioperations(Dictionary<string, string[][]> solutionBF, int rang)
         {
-            if (solutionBF.ContainsKey("no conditions") || solutionBF.ContainsKey("no solution")) return solutionBF;
+            if (solutionBF.ContainsKey("no solution")) return solutionBF;
             Dictionary<string, string[][]> solutionMO = new Dictionary<string, string[][]>();
             foreach (KeyValuePair<string, string[][]> kvp in solutionBF)
             {
-                string key = BuildKeyMultioperation(kvp.Key, rang);
-                solutionMO.Add(key, kvp.Value);
+                bool noConditions = solutionBF.ContainsKey("no conditions");
+                string key = noConditions ? "no conditions" : BuildKeyMultioperation(kvp.Key, rang);
+                string[][] result = BuildValueMultioperation(kvp.Value, rang);
+                solutionMO.Add(key, result);
             }
             return solutionMO;
         }
@@ -112,12 +110,52 @@ namespace SolutionSystemEquationMultioperations
                 {
                     if (elems[i] != 0)
                     {
-                        logElem += (int)Math.Pow(rang, i);
+                        logElem += (int)Math.Pow(2, i);
                     }
                 }
                 key += $"{logElem},";
             }
             return key.TrimEnd(',');
+        }
+
+        private string[][] BuildValueMultioperation(string[][] resultBF, int rang)
+        {
+            string[][] newValue = new string[resultBF.Length][];
+            for (int r = 0; r < resultBF.Length; r++)
+            {
+                Dictionary<string, int[]> multioperations = new Dictionary<string, int[]>();
+                string answer = "";
+                int countNewValue = 0;
+
+                foreach (string elem in resultBF[r])
+                {
+                    string arg = elem.Split('_')[0];
+                    int index = Convert.ToInt32(elem.Split('_')[1].Split('=')[0]) - 1;
+                    int value = Convert.ToInt32(elem.Split('_')[1].Split('=')[1]);
+                    if (!multioperations.ContainsKey(arg))
+                        multioperations.Add(arg, new int[rang]);
+                    multioperations[arg][index] = value;
+                }
+
+                newValue[r] = new string[multioperations.Count];
+                foreach (KeyValuePair<string, int[]> kvp in multioperations)
+                {
+                    int logElem = 0;
+                    int[] elems = kvp.Value;
+                    answer = $"{kvp.Key} = ";
+                    for (int i = 0; i < elems.Length; i++)
+                    {
+                        if (elems[i] != 0)
+                        {
+                            logElem += (int)Math.Pow(2, i);
+                        }
+                    }
+                    answer += $"{logElem}";
+                    newValue[r][countNewValue] = answer;
+                    countNewValue++;
+                }
+            }
+            return newValue;
         }
     }
 }

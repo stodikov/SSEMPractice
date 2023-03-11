@@ -186,7 +186,12 @@ namespace SolutionSystemEquationMultioperations.methods
             string key = "";
             if (argumentsConditions == "" && keysArguments.Count == unknowsArr.Length) key = "no conditions"; //1 Все неизвестные - no conditions (Если есть условие с неизвестными - они будут отражены в ответе)
             else if (argumentsConditions != "" && keysArguments.Count != unknowsArr.Length) key = BuildKeyOnCondition(currentRes[0]); //2 Есть коэфициенты и условия на них - ключ по условию на коэфициента
-            else key = BuildKeyOnCoefficients(currentRes[0], coefficientsArr); //3 Есть коэфициенты, но нет условий - ключ по коэфициентам
+            else key = BuildKeyOnCoefficients(currentRes[0], coefficientsArr); //3 Есть коэфициенты, но нет условий - ключ по коэфициентам | Зачем?
+            /*
+             * У нас не может быть вектора, потому что под каждый вариант строится свой ключ. Зачем? Не знаю.
+             * Скорее всего была логика, когда было несколько неизвестных (но никаких предпосылок в коде для данного предположения не нашел)
+             * Нужно понять зачем 3 условие и ничего ли я не сломаю, когда опущу его
+             */
 
             if (!setsForResult.ContainsKey(key)) setsForResult.Add(key, new List<string[]>());
             setsForResult[key].Add(BuildSet(currentRes, unknowsArr));
@@ -249,7 +254,11 @@ namespace SolutionSystemEquationMultioperations.methods
                 for (int i = 0; i < result.Length; i++) result[i] = new string[unknowns.Length];
                 for (int i = 0; i < sets[0].Length; i++)
                 {
-                    for (int u = 0; u < unknowns.Length; u++) result[count][u] += sets[0][i][u];
+                    for (int u = 0; u < unknowns.Length; u++)
+                    {
+                        if (result[count][u] == null) result[count][u] = $"{unknowns[u]}=";
+                        result[count][u] += sets[0][i][u];
+                    }
                     count++;
                 }
             }
@@ -271,6 +280,7 @@ namespace SolutionSystemEquationMultioperations.methods
                             {
                                 for (int j = 0; j < unknowns.Length; j++)
                                 {
+                                    if (result[count][j] == null) result[count][j] = $"{unknowns[j]}="; //? Работает ли?
                                     result[count][j] += sets[k][p][j];
                                 }
                                 count++;

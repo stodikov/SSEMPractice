@@ -44,7 +44,7 @@ namespace SolutionSystemEquationMultioperations
             }
             if (result.ContainsKey("no solution"))
             {
-                textBox_resualEquation.Text += "Решения нет";
+                textBox_resualEquation.Text += "Решений нет";
                 return;
             }
 
@@ -52,42 +52,26 @@ namespace SolutionSystemEquationMultioperations
 
             foreach (KeyValuePair<string, string[][]> kvpRes in result)
             {
-                string[] elementsCondition = kvpRes.Key.Split(',');
+                string[] conditions = kvpRes.Key.Split(',');
                 string[][] resValue = kvpRes.Value;
                 string answer = "", condition = "";
-                //Формирование неизвестных
-                string[] unknowns = textBox_unknows.Text.Split(',');
-                string[] unknownsArr = new string[unknowns.Length * rang];
                 char[] trimElem = new char[] { ' ', ',' };
-                int lenUnknownsArr = 0;
-                foreach (string unknow in unknowns)
-                {
-                    for (int i = 0; i < rang; i++)
-                    {
-                        unknownsArr[lenUnknownsArr] = $"{unknow}_{i + 1}";
-                        lenUnknownsArr++;
-                    }
-                }
-                //Формирование неизвестных
+                int countUnknowns = textBox_unknows.Text.Split(',').Length;
 
-                if (elementsCondition[0] != "no conditions")
+                if (conditions[0] != "no conditions")
                 {
-                    foreach (string elem in elementsCondition)
-                    {
-                        string[] split = elem.Split('=');
-                        condition += $"{split[0]} = {split[1]}, ";
-                    }
+                    foreach (string elem in conditions) condition += $"{elem}, ";
                     condition = condition.TrimEnd(trimElem);
                     answer += $"При {condition}";
                 }
                 answer = answer != "" ? answer.TrimEnd(trimElem) + "\r\n" : "";
                 if (radioButton_horizontalFormat.Checked)
                 {
-                    for (int i = 0; i < unknownsArr.Length; i++)
+                    for (int i = 0; i < countUnknowns; i++)
                     {
                         for (int j = 0; j < resValue.Length; j++)
                         {
-                            answer += $"{unknownsArr[i]} = {resValue[j][i]}   ";
+                            answer += $"{resValue[j][i]}    ";
                         }
                         answer += "\r\n";
                     }
@@ -97,7 +81,7 @@ namespace SolutionSystemEquationMultioperations
                 {
                     for (int i = 0; i < resValue.Length; i++)
                     {
-                        for (int j = 0; j < unknownsArr.Length; j++) answer += $"{unknownsArr[j]} = {resValue[i][j]}\r\n";
+                        for (int j = 0; j < countUnknowns; j++) answer += $"{resValue[i][j]}\r\n";
                         answer += "\r\n";
                     }
                 }

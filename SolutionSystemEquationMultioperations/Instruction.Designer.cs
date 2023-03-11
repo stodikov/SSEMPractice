@@ -179,17 +179,17 @@
             // 
             this.label36.AutoSize = true;
             this.label36.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label36.Location = new System.Drawing.Point(564, 117);
+            this.label36.Location = new System.Drawing.Point(530, 117);
             this.label36.Name = "label36";
-            this.label36.Size = new System.Drawing.Size(589, 20);
+            this.label36.Size = new System.Drawing.Size(576, 20);
             this.label36.TabIndex = 36;
-            this.label36.Text = ", где каждый столбец - это кодировка для каждого элемента в векторе m1.";
+            this.label36.Text = ", где каждый столбец - это кодировка для каждого элемента в векторе h.";
             // 
             // label37
             // 
             this.label37.AutoSize = true;
             this.label37.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label37.Location = new System.Drawing.Point(504, 109);
+            this.label37.Location = new System.Drawing.Point(479, 109);
             this.label37.Name = "label37";
             this.label37.Size = new System.Drawing.Size(57, 40);
             this.label37.TabIndex = 37;
@@ -201,9 +201,9 @@
             this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label38.Location = new System.Drawing.Point(15, 117);
             this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(494, 20);
+            this.label38.Size = new System.Drawing.Size(468, 20);
             this.label38.TabIndex = 38;
-            this.label38.Text = "Представление m1 в виде пространственной матрицы M_m1 = ";
+            this.label38.Text = "Представление h в виде пространственной матрицы M_h = ";
             // 
             // label39
             // 
@@ -287,7 +287,7 @@
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label6.Location = new System.Drawing.Point(15, 1663);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(906, 140);
+            this.label6.Size = new System.Drawing.Size(796, 140);
             this.label6.TabIndex = 47;
             this.label6.Text = resources.GetString("label6.Text");
             // 
@@ -297,9 +297,9 @@
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label7.Location = new System.Drawing.Point(15, 1631);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(285, 20);
+            this.label7.Size = new System.Drawing.Size(544, 20);
             this.label7.TabIndex = 46;
-            this.label7.Text = "Пример по работе с программой";
+            this.label7.Text = "Примеры, которые помогут понять как работать с программой";
             // 
             // Instruction
             // 
@@ -332,7 +332,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label_title);
             this.Name = "Instruction";
-            this.Text = "Instruction";
+            this.Text = "Инструкция";
             this.ResumeLayout(false);
             this.PerformLayout();
 
