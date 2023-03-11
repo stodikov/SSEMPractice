@@ -7,14 +7,6 @@ namespace SolutionSystemEquationMultioperations
 {
     class Controller
     {
-        /*
-         * 1) Подсказки: короткая - для быстрого запуска программы, и большая - подробное описание как все работает
-         * 2) Сохранение и загрузка файлов
-         * 3) Как задавать условия?
-         * 
-         * 1) Ввод правил вывода: реализация импликации и конъюнкции
-         * 2) Подвод программы под экспертную системы (Реализация множества по методичке)
-         */
         PrepairingData data = new PrepairingData();
         Transition transition = new Transition();
         methods.NumericalMethod NM = new methods.NumericalMethod();

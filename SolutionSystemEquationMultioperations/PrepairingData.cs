@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace SolutionSystemEquationMultioperations
 {
@@ -10,7 +11,7 @@ namespace SolutionSystemEquationMultioperations
     {
         public int rang { get; set; }
         public Dictionary<string, Multioperation> multioperations { get; set; }
-        public string[] conditions { get; set; }
+        public Dictionary<string, int[]> conditions { get; set; }
         public string coefficients { get; set; }
         public string unknowns { get; set; }
         public string[] equations { get; set; }
@@ -31,11 +32,13 @@ namespace SolutionSystemEquationMultioperations
             coefficients = "";
             unknowns = "";
             equations = new string[0];
-            conditions = new string[0];
             elementsOfEquation.Clear();
 
             if (multioperations == null) multioperations = new Dictionary<string, Multioperation>();
             else multioperations.Clear();
+
+            if (conditions == null) conditions = new Dictionary<string, int[]>();
+            else conditions.Clear();
         }
 
         public void PreparingData(string rang, string equation, string multioperations, string coefficients, string unknowns, string conditions)
@@ -52,7 +55,7 @@ namespace SolutionSystemEquationMultioperations
             //Проверка неизвестных
             ValidateUnknowns(unknowns.Split(','));
             //Проверка условий
-            if (conditions != "") ValidateConditions(conditions.Replace("\r", "").Split('\n'));
+            if (conditions != "") ValidateConditions(conditions.Replace("\r", "").Split('\n'), coefficients, unknowns);
             if (error != "") return;
             //Проверка уравнения
             ValidateEquation(equation.Replace("\r", "").Split('\n'), vectorsMultioperations);
@@ -73,6 +76,7 @@ namespace SolutionSystemEquationMultioperations
             foreach (string s in multioperations)
             {
                 int[] multioperation;
+                int maxNumberRang = (int)Math.Pow(2, rang);
                 string[] input = s.Split('=');
                 if (input.Length != 2) error = $"Неправильно задана мультиоперация {input[0]}|";
 
@@ -84,7 +88,8 @@ namespace SolutionSystemEquationMultioperations
                     for (int i = 0; i < input[1].Length; i++)
                     {
                         bool isNumber = int.TryParse($"{input[1][i]}", out multioperation[i]);
-                        if (!isNumber) error += $"Ошибка в мультиоперации {input[0]} - элементы мультиоперации должны быть от 0 до {Math.Pow(2, rang) - 1}|";
+                        bool isRangNumber = multioperation[i] <= maxNumberRang;
+                        if (!isNumber || !isRangNumber) error += $"Ошибка в мультиоперации {input[0]} - элементы мультиоперации должны быть от 0 до {Math.Pow(2, rang) - 1}|";
                     }
                 }
                 else
@@ -96,7 +101,8 @@ namespace SolutionSystemEquationMultioperations
                     for (int i = 0; i < elementsMO.Length; i++)
                     {
                         bool isNumber = int.TryParse($"{elementsMO[i]}", out multioperation[i]);
-                        if (!isNumber) error += $"Ошибка в мультиоперации {input[0]} - элементы мультиоперации должны быть от 0 до {Math.Pow(2, rang) - 1}|";
+                        bool isRangNumber = multioperation[i] <= maxNumberRang;
+                        if (!isNumber || !isRangNumber) error += $"Ошибка в мультиоперации {input[0]} - элементы мультиоперации должны быть от 0 до {Math.Pow(2, rang) - 1}|";
                     }
                 }
                 if (elementsOfEquation.ContainsKey(input[0])) error = $"Обозначение мультиоперации {input[0]} уже используется|";
@@ -146,21 +152,41 @@ namespace SolutionSystemEquationMultioperations
             this.unknowns = unknownsOfEquation.TrimEnd(',');
         }
 
-        private void ValidateConditions(string[] conditions)
+        private void ValidateConditions(string[] conditions, string coefficients, string unknowns)
         {
-            string[] unknowns = this.unknowns.Split(',');
-            string[] coefficients = this.coefficients.Split(',');
+            Dictionary<string, int[]> newConditions = new Dictionary<string, int[]>();
+            int maxNumberRang = (int)Math.Pow(2, rang);
+
+            string[] unknownsArr = unknowns.Split(',');
+            string[] coefficientsArr = coefficients.Split(',');
             foreach (string condition in conditions)
             {
-                string[] elementsOfCondition = condition.Split('|');
+                string[] elementsOfCondition = condition.Split('=');
                 if (elementsOfCondition.Length < 2) error += $"Неправильно задано условие - {condition}|";
-                if (elementsOfCondition[0] != "!=") error += $"Неизвестный символ условия - {condition}|";
 
-                elementsOfCondition = elementsOfCondition[1].Split(',');
-                foreach (string element in elementsOfCondition)
-                    if (!Array.Exists(unknowns, unknown => unknown == element) && !Array.Exists(coefficients, coefficient => coefficient == element)) error += $"Неизвестный коэффициент в условие - {condition} - {element}|";
+                string key = elementsOfCondition[0];
+                if (!Array.Exists(unknownsArr, unknown => unknown == key) &&
+                    !Array.Exists(coefficientsArr, coefficient => coefficient == key))
+                    error += $"Неизвестный аргумент в условие - {condition} - {key}|";
+
+                if (error == "")
+                {
+                    elementsOfCondition = elementsOfCondition[1].Split(',');
+                    if (!newConditions.ContainsKey(key)) newConditions.Add(key, new int[elementsOfCondition.Length]);
+                    else error += $"Аргумент {key} в условиях используется несколько раз|";
+
+                    int[] elements = new int[elementsOfCondition.Length];
+                    for (int i = 0; i < elementsOfCondition.Length; i++)
+                    {
+                        bool isNumber = int.TryParse($"{elementsOfCondition[i]}", out elements[i]);
+                        bool isRangNumber = elements[i] <= maxNumberRang;
+                        if (!isNumber || !isRangNumber) error += $"Ошибка в условии {condition} - элементы условия должны быть от 0 до {Math.Pow(2, rang) - 1}|";
+                    }
+                    newConditions[key] = elements;
+                }
+                    
             }
-            if (error == "") this.conditions = conditions;
+            this.conditions = newConditions;
         }
 
         private void ValidateEquation(string[] equations, Dictionary<string, int[]> vectorsMultioperations)

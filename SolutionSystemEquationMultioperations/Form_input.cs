@@ -71,7 +71,7 @@ namespace SolutionSystemEquationMultioperations
                     {
                         for (int j = 0; j < resValue.Length; j++)
                         {
-                            answer += $"{resValue[j][i]}    ";
+                            answer += $"{resValue[j][i]}, ";
                         }
                         answer += "\r\n";
                     }

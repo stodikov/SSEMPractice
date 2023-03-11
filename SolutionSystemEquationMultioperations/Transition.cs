@@ -105,14 +105,9 @@ namespace SolutionSystemEquationMultioperations
             {
                 int logElem = 0;
                 int[] elems = kvp.Value;
-                key = $"{kvp.Key} = ";
+                key += $"{kvp.Key} = ";
                 for (int i = 0; i < elems.Length; i++)
-                {
-                    if (elems[i] != 0)
-                    {
-                        logElem += (int)Math.Pow(2, i);
-                    }
-                }
+                    if (elems[i] != 0) logElem += (int)Math.Pow(2, i);
                 key += $"{logElem},";
             }
             return key.TrimEnd(',');

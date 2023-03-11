@@ -13,7 +13,7 @@ namespace SolutionSystemEquationMultioperations.methods
         Dictionary<string, string[][]> solution = new Dictionary<string, string[][]>();
         string argumentsConditions = "";
 
-        public Dictionary<string, string[][]> GetSolution(int rang, string[] equation, string coefficients, string unknowns, string[] conditionsInput = null)
+        public Dictionary<string, string[][]> GetSolution(int rang, string[] equation, string coefficients, string unknowns, Dictionary<string, int[]> conditions = null)
         {
             string[] coefficientsArr = coefficients == "" ? new string[0] : coefficients.Split(',');
             string[] unknownsArr = unknowns.Split(',');
@@ -26,35 +26,15 @@ namespace SolutionSystemEquationMultioperations.methods
             string[] arguments = coefficientsArr.Concat(unknownsArr).ToArray();
             for (int i = 0; i < arguments.Length; i++) keysArguments.Add(arguments[i], i);
 
-            if (conditionsInput != null) equation = AddConditionsToEquation(equation, conditionsInput);
-
             //Надо убрать переменные, которые являются искомыми
             string[] argumentsConditionsArr = argumentsConditions.Trim(',').Split(',');
             argumentsConditions = DeleteUnknowsFromArgumentCondition(argumentsConditionsArr, unknownsArr);
 
-            SetsForResult(equation, coefficientsArr, unknownsArr);
+            SetsForResult(equation, coefficientsArr, unknownsArr, rang, conditions);
             if (setsForResult.Keys.Count != 0) GetResultEquation(rang, unknownsArr);
             else solution.Add("no solution", new string[][] { new string[] { "no solution" } });
 
             return solution;
-        }
-
-        private string[] AddConditionsToEquation(string[] equation, string[] conditionsInput)
-        {
-            string[] temp = new string[equation.Length + conditionsInput.Length];
-            int c = 0;
-            for (int i = 0; i < temp.Length; i++)
-            {
-                if (i < equation.Length) temp[i] = equation[i];
-                else
-                {
-                    string t = EquationForConditions(conditionsInput[c]);
-                    temp[i] = t;
-                    c++;
-                }
-            }
-            equation = temp;
-            return equation;
         }
 
         private string DeleteUnknowsFromArgumentCondition(string[] arguments, string[] unknows)
@@ -71,34 +51,17 @@ namespace SolutionSystemEquationMultioperations.methods
             return res.Trim(',');
         }
 
-        private string EquationForConditions(string condition)
-        {
-            string equationConditions = "";
-            string operatorCondition = condition.Split('|')[0];
-            string[] arguments = condition.Split('|')[1].Split(',');
-            foreach (string argument in arguments)
-            {
-                if (!argumentsConditions.Contains(argument)) argumentsConditions += $"{argument},";
-            }
-            switch (operatorCondition)
-            {
-                case "!=":
-                    equationConditions += $"{arguments[0]}&{arguments[1]}V-{arguments[0]}&-{arguments[1]}<0";
-                    break;
-            }
-            return equationConditions;
-        }
-
         /*
          * Неправильно формируются пары
          * */
 
-        private void SetsForResult(string[] equation, string[] coefficientsArr, string[] unknownsArr)
+        private void SetsForResult(string[] equation, string[] coefficientsArr, string[] unknownsArr, int rang, Dictionary<string, int[]> conditions = null)
         {
             int truthLimit = (int)Math.Pow(2, keysArguments.Count);
             int setsLimit = (int)Math.Pow(2, unknownsArr.Length); //? А если условий нет?
-            int currentSetLimit = 0;
+            int currentSetLimit = 0, resOnBinarySet = 0;
             string currentRes = "";
+            bool flag = false;
             for (int i = 0; i < truthLimit; i++)
             {
                 currentSetLimit++;
@@ -111,7 +74,9 @@ namespace SolutionSystemEquationMultioperations.methods
                     binarySet = temp + binarySet;
                 }
                 //?
-                int resOnBinarySet = GetResultOnBinarySet(binarySet, equation);
+                if (conditions != null) flag = CheckBinarySetOnConditions(binarySet, conditions, rang);
+                if (flag) resOnBinarySet = GetResultOnBinarySet(binarySet, equation);
+                else resOnBinarySet = 1;
                 if (resOnBinarySet == 0) currentRes += $"{binarySet},";
 
                 if (currentSetLimit == setsLimit)
@@ -121,6 +86,25 @@ namespace SolutionSystemEquationMultioperations.methods
                     currentRes = "";
                 }
             }
+        }
+
+        private bool CheckBinarySetOnConditions(string binarySet, Dictionary<string, int[]> conditions, int rang)
+        {
+            int elementOfBinary = 0, binaryMO = 0;
+            int[] elements;
+            string key;
+            foreach (KeyValuePair<string, int[]> kvp in conditions)
+            {
+                key = kvp.Key;
+                elements = kvp.Value;
+                for (int i = 0; i < rang; i++)
+                {
+                    elementOfBinary = binarySet[keysArguments[$"{key}_{i + 1}"]] - '0';
+                    if (elementOfBinary == 1) binaryMO += (int)Math.Pow(2, i);
+                }
+                if (!Array.Exists(elements, elem => elem == binaryMO)) return false;
+            }
+            return true;
         }
 
         private int GetResultOnBinarySet(string binarySet, string[] equation)
