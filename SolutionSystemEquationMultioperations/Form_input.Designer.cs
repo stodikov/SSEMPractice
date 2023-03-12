@@ -200,7 +200,7 @@
             this.textBox_conditions.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBox_conditions.Size = new System.Drawing.Size(168, 161);
             this.textBox_conditions.TabIndex = 13;
-            this.textBox_conditions.Text = "!=|c_1,c_2";
+            this.textBox_conditions.Text = "c=1,2";
             this.textBox_conditions.WordWrap = false;
             // 
             // groupBox_Equation

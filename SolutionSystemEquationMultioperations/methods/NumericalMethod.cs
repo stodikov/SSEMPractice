@@ -95,6 +95,7 @@ namespace SolutionSystemEquationMultioperations.methods
             string key;
             foreach (KeyValuePair<string, int[]> kvp in conditions)
             {
+                binaryMO = 0;
                 key = kvp.Key;
                 elements = kvp.Value;
                 for (int i = 0; i < rang; i++)
